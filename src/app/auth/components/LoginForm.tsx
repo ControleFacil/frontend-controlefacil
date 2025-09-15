@@ -3,19 +3,31 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { loginDashboard } from "@/http/api/auth/authService";
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/dashboard");
-  };
+    setLoading(true);
+    setError(null);
 
+    try {
+      await loginDashboard(email, password, remember);
+      router.push("/dashboard"); // redireciona após login
+    } catch (err: any) {
+      console.error("Erro ao logar:", err);
+      setError("E-mail ou senha inválidos. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-[-8px_8px_12px_rgba(168,85,247,0.7)]">
       <h2 className="text-2xl font-semibold mb-1 text-gray-800">Login</h2>
@@ -54,15 +66,18 @@ const LoginForm: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition"
+          disabled={loading}
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition disabled:opacity-50"
         >
-          Login
+          {loading ? "Entrando..." : "Login"}
         </button>
       </form>
+
 
       <div className="mt-3 text-sm text-purple-600 cursor-pointer">
         Esqueceu a senha?
       </div>
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
       {/* Divider */}
       <div className="flex items-center my-5">
