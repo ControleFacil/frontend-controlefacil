@@ -20,7 +20,7 @@ const LoginForm: React.FC = () => {
 
     try {
       await loginDashboard(email, password, remember);
-      router.push("/dashboard"); // redireciona após login
+      router.push("/dashboard");
     } catch (err: any) {
       console.error("Erro ao logar:", err);
       setError("E-mail ou senha inválidos. Tente novamente.");
