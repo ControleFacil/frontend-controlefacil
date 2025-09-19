@@ -10,39 +10,20 @@ import FutureExpenses from "./components/FutureExpenses";
 export default function DashboardPage() {
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Main content */}
+      <Sidebar/>
       <main className="flex-1 p-6 overflow-y-auto">
-        <Header />
-
-        {/* Seção dos cards pequenos */}
-        <section className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-xl shadow">Saúde</div>
-          <div className="bg-white p-4 rounded-xl shadow">Mercado</div>
-          <div className="bg-white p-4 rounded-xl shadow">Lazer</div>
-          <div className="bg-white p-4 rounded-xl shadow">Casa</div>
-        </section>
-
-        {/* Metas / Saúde financeira / Cartão */}
-        <section className="grid grid-cols-3 gap-4">
-          <div className="col-span-2 space-y-4">
-            <Goals />
-            <FinancialHealth />
+        <Header/>
+        <section className="grid grid-cols-3 gap-7">
+          <div className="col-span-2 space-y-10">
+            <Goals/>
+            <FinancialHealth/>
+             <MonthlyView/>
           </div>
-          <CardInfo/>
-        </section>
-
-        {/* Visão mensal / Gastos futuros */}
-        <section className="grid grid-cols-3 gap-4 mt-6">
-          <MonthlyView />
-          <FutureExpenses />
-        </section>
-
-        {/* Transações */}
-        <section className="mt-6">
-          <Transactions />
+          <div className="flex flex-col gap-10">
+            <CardInfo/>
+            <Transactions/>
+            <FutureExpenses/>
+          </div>
         </section>
       </main>
     </div>

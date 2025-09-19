@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Progress from './ui/progress';
 
-// Definindo a interface para uma meta
 interface Goal {
   id: string;
   title: string;
@@ -37,12 +36,10 @@ export default function Goals() {
     },
   ]);
 
-  // Função para calcular a porcentagem de progresso
   const calculateProgress = (current: number, target: number): number => {
     return Math.round((current / target) * 100);
   };
 
-  // Função para adicionar valor a uma meta
   const addToGoal = (id: string, amount: number) => {
     setGoals(goals.map(goal => 
       goal.id === id 

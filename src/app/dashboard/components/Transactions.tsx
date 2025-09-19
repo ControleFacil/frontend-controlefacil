@@ -2,7 +2,7 @@ import { ArrowRight, Car } from "lucide-react";
 
 export default function Transactions() {
   return (
-    <div className="bg-white p-6 rounded-xl shadow">
+    <div className="bg-white p-6 rounded-xl shadow h-60">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Histórico de Transações</h2>
         <button className="flex items-center gap-2 text-purple-600 font-medium">
