@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Progress from './ui/progress';
+import { getMetas, MetaResponse } from '@/http/api/dashboard/dashboardService';
 
 interface Goal {
   id: string;
@@ -12,29 +13,39 @@ interface Goal {
 }
 
 export default function Goals() {
-  const [goals, setGoals] = useState<Goal[]>([
-    {
-      id: '1',
-      title: 'Fundo de Emergência',
-      targetAmount: 10000,
-      currentAmount: 7000,
-      color: 'green'
-    },
-    {
-      id: '2',
-      title: 'Carro Novo',
-      targetAmount: 50000,
-      currentAmount: 20000,
-      color: 'blue'
-    },
-    {
-      id: '3',
-      title: 'Férias',
-      targetAmount: 5000,
-      currentAmount: 2750,
-      color: 'purple'
-    },
-  ]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchMetas = async () => {
+      try {
+        setLoading(true);
+        const metasData = await getMetas();
+        
+        const mappedGoals: Goal[] = metasData.map((meta, index) => {
+          const colors: ('blue' | 'green' | 'red' | 'yellow' | 'purple')[] = 
+            ['green', 'blue', 'purple', 'red', 'yellow'];
+          
+          return {
+            id: meta.id,
+            title: meta.titulo,
+            targetAmount: meta.meta,
+            currentAmount: meta.atual,
+            color: colors[index % colors.length]
+          };
+        });
+        
+        setGoals(mappedGoals);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro ao carregar metas');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMetas();
+  }, []);
 
   const calculateProgress = (current: number, target: number): number => {
     return Math.round((current / target) * 100);
@@ -47,6 +58,42 @@ export default function Goals() {
         : goal
     ));
   };
+
+  if (loading) {
+    return (
+      <section className="bg-white shadow-md rounded-2xl p-6 animate-pulse">
+        <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i}>
+              <div className="flex justify-between items-center mb-1">
+                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+              </div>
+              <div className="w-full h-2 bg-gray-200 rounded-full"></div>
+              <div className="flex justify-between items-center mt-1">
+                <div className="h-3 bg-gray-200 rounded w-1/6"></div>
+                <div className="flex space-x-1">
+                  <div className="h-6 bg-gray-200 rounded w-10"></div>
+                  <div className="h-6 bg-gray-200 rounded w-10"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="bg-white shadow-md rounded-2xl p-6">
+        <div className="text-red-500 text-center">
+          Erro ao carregar metas: {error}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-white shadow-md rounded-2xl p-6">
