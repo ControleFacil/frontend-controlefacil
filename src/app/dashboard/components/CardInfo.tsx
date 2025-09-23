@@ -66,13 +66,13 @@ export default function CardInfo() {
       </div>
 
       <div className="mb-6">
-        <p className="text-lg font-semibold tracking-wider">{cartao.numero}</p>
-        <p className="text-sm text-black-200">{cartao.validade}</p>
+        <p className="text-lg font-semibold tracking-wider">{cartao.id}</p>
+        <p className="text-sm text-black-200">{cartao.descricao}</p>
       </div>
 
       <div className="flex justify-between items-center text-sm">
-        <span>{cartao.titular}</span>
-        <span className="uppercase">{cartao.bandeira}</span>
+        <span>{cartao.valor}</span>
+        <span className="uppercase">{cartao.hora}</span>
       </div>
     </section>
   );

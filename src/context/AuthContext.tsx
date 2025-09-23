@@ -14,6 +14,7 @@ interface AuthContextType {
   user: { email: string } | null;
   login: (token: string, email: string, rememberMe: boolean) => void;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<{ email: string } | null>(null);
+  const [loading, setLoading] = useState(true); // 👈 novo
   const router = useRouter();
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(true);
       setUser({ email: userEmail });
     }
+    setLoading(false);
   }, []);
 
   const login = (
@@ -59,9 +62,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     router.push("/auth/login");
   };
+
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, login, logout}}
+      value={{ isAuthenticated, user, login, logout, loading }}
     >
       {children}
     </AuthContext.Provider>

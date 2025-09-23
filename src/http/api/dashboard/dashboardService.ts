@@ -12,10 +12,10 @@ export interface SaudeFinanceiraResponse {
 }
 
 export interface CartaoResponse {
-  numero: string;
-  validade: string;
-  titular: string;
-  bandeira: string;
+  id: string;
+  descricao: string;
+  valor: string;
+  hora: string;
 }
 
 export interface TransacaoResponse {
