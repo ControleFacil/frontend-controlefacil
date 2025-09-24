@@ -40,15 +40,20 @@ export default function MonthlyView() {
   const entradas = data.reduce((acc, item) => acc + item.entrada, 0);
   const saidas = data.reduce((acc, item) => acc + item.saida, 0);
   const saldo = entradas - saidas;
-  const saldoAtual =
-    data.length >= 1
-      ? (data[data.length - 1].entrada ?? 0) - (data[data.length - 1].saida ?? 0)
-      : 0;
+  const mesesComMovimento = data.filter(item => item.entrada > 0 || item.saida > 0);
 
-  const saldoAnterior =
-    data.length >= 2
-      ? (data[data.length - 2].entrada ?? 0) - (data[data.length - 2].saida ?? 0)
-      : 0;
+  let saldoAtual = 0;
+  let saldoAnterior = 0;
+
+  if (mesesComMovimento.length > 0) {
+    const ultimo = mesesComMovimento[mesesComMovimento.length - 1];
+    saldoAtual = ultimo.entrada - ultimo.saida;
+
+    if (mesesComMovimento.length > 1) {
+      const penultimo = mesesComMovimento[mesesComMovimento.length - 2];
+      saldoAnterior = penultimo.entrada - penultimo.saida;
+    }
+  }
 
   const diferenca = saldoAtual - saldoAnterior;
 
