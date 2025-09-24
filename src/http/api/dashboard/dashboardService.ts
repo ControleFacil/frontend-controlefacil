@@ -87,6 +87,16 @@ export const getGastosFuturos = async (): Promise<GastoFuturoResponse[]> => {
     throw new Error('Não foi possível carregar os gastos futuros');
   }
 };
+export const createGastoFuturo = async (gasto: { descricao: string; valor: number; data: string }) => {
+  try {
+    const response = await api.post('/api/gastos-futuros', gasto);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao criar gasto futuro:', error);
+    throw new Error('Não foi possível criar o gasto futuro');
+  }
+};
+
 
 export const getVisaoMensal = async (): Promise<VisaoMensalResponse[]> => {
   try {

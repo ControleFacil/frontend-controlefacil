@@ -1,8 +1,8 @@
 'use client';
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getGastosFuturos, GastoFuturoResponse } from "@/http/api/dashboard/dashboardService";
+import { getGastosFuturos, GastoFuturoResponse, createGastoFuturo } from "@/http/api/dashboard/dashboardService";
 
 const getInitials = (label: string): string => {
   return label.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
@@ -17,62 +17,58 @@ export default function FutureExpenses() {
   const [gastos, setGastos] = useState<GastoFuturoResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+
+  const [descricao, setDescricao] = useState('');
+  const [valor, setValor] = useState('');
+  const [data, setData] = useState('');
+
+  const fetchGastos = async () => {
+    try {
+      setLoading(true);
+      const data = await getGastosFuturos();
+      setGastos(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao carregar gastos futuros');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchGastosFuturos = async () => {
-      try {
-        setLoading(true);
-        const data = await getGastosFuturos();
-        setGastos(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erro ao carregar gastos futuros');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGastosFuturos();
+    fetchGastos();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="bg-white p-6 rounded-xl shadow animate-pulse">
-        <div className="flex justify-between items-center mb-4">
-          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-        </div>
-        <div className="space-y-3">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex justify-between items-center p-3 rounded-lg bg-gray-100">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                <div className="h-4 bg-gray-200 rounded w-20"></div>
-              </div>
-              <div className="h-4 bg-gray-200 rounded w-16"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-white p-6 rounded-xl shadow">
-        <div className="text-red-500 text-center">
-          Erro ao carregar gastos futuros
-        </div>
-      </div>
-    );
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createGastoFuturo({ descricao, valor: parseFloat(valor), data });
+      setDescricao('');
+      setValor('');
+      setData('');
+      setOpen(false);
+      fetchGastos(); // Recarrega a lista
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao criar gasto futuro');
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-xl shadow">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Gastos Futuros</h2>
-        <button className="flex items-center gap-2 text-purple-600 font-medium">
-          Detalhes <ArrowRight size={16} />
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setOpen(true)}
+            className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <button className="flex items-center gap-2 text-purple-600 font-medium">
+            Detalhes <ArrowRight size={16} />
+          </button>
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -95,6 +91,55 @@ export default function FutureExpenses() {
           </div>
         ))}
       </div>
+
+      {open && (
+        <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h3 className="text-lg font-semibold mb-4">Adicionar Gasto Futuro</h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Descrição"
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                required
+              />
+              <input
+                type="number"
+                placeholder="Valor"
+                value={valor}
+                onChange={(e) => setValor(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                step="0.01"
+                required
+              />
+              <input
+                type="date"
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                required
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700"
+                >
+                  Salvar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
