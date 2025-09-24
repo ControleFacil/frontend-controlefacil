@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/",
-  timeout: 150000, // 150 segundos irei mudar mas como ainda sou pobre e nao tenho um servidor pago terei que buscar do render e é lento
+  timeout: 150000, // 150 segundos
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -10,10 +10,7 @@ export const api = axios.create({
   withCredentials: false,
 });
 
-const publicEndpoints = [
-  "/users",
-  "/login"
-];
+const publicEndpoints = ["/users", "/login"];
 
 api.interceptors.request.use((config) => {
   const isPublic = publicEndpoints.some((endpoint) =>
@@ -39,7 +36,12 @@ api.interceptors.response.use(
 
     if (response && response.status === 404) {
       console.warn(`404 - Recurso não encontrado em: ${config.url}`);
-      return Promise.resolve({ data: null, status: 404, config, headers: response.headers });
+      return Promise.resolve({
+        data: null,
+        status: 404,
+        config,
+        headers: response.headers,
+      });
     }
 
     if (error.code === "ECONNABORTED") {
@@ -51,7 +53,7 @@ api.interceptors.response.use(
     if (response) {
       const resData = response.data;
       const defaultMessage = `Erro ${response.status}`;
-      let errorMessage = '';
+      let errorMessage = "";
 
       if (typeof resData === "string") errorMessage = resData;
       else if (resData?.message) errorMessage = resData.message;
@@ -65,10 +67,15 @@ api.interceptors.response.use(
           if (typeof window !== "undefined") {
             localStorage.clear();
             sessionStorage.clear();
+            window.location.href = "/auth/login";
           }
           break;
         case 403:
-          error.message = "Acesso negado.";
+          if (typeof window !== "undefined") {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = "/auth/login";
+          }
           break;
         case 500:
           error.message = "Erro interno no servidor.";

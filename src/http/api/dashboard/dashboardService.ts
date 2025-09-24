@@ -7,6 +7,7 @@ export interface MetaResponse {
   meta: number;
 }
 
+
 export interface SaudeFinanceiraResponse {
   percentual: number;
 }
@@ -33,7 +34,8 @@ export interface GastoFuturoResponse {
 
 export interface VisaoMensalResponse {
   mes: string;
-  valor: number;
+  entrada: number;
+  saida: number;
 }
 
 export const getMetas = async (): Promise<MetaResponse[]> => {

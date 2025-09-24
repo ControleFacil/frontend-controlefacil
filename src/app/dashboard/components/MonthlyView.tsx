@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  LineChart,
   Line,
   XAxis,
   Tooltip,
@@ -9,30 +8,50 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import { useEffect, useState } from "react";
+import { getVisaoMensal, VisaoMensalResponse } from "@/http/api/dashboard/dashboardService";
 
-const data = [
-  { mes: "Jan", entrada: 5000, saida: 3200 },
-  { mes: "Fev", entrada: 6200, saida: 4100 },
-  { mes: "Mar", entrada: 4800, saida: 2900 },
-  { mes: "Abr", entrada: 7500, saida: 5100 },
-  { mes: "Mai", entrada: 6700, saida: 3700 },
-  { mes: "Jun", entrada: 8300, saida: 4892 },
-  { mes: "Jul", entrada: 7200, saida: 4200 },
-  { mes: "Ago", entrada: 9100, saida: 5600 },
-  { mes: "Set", entrada: 8400, saida: 4700 },
-  { mes: "Out", entrada: 7800, saida: 3900 },
-  { mes: "Nov", entrada: 9800, saida: 5900 },
-  { mes: "Dez", entrada: 12800, saida: 2900 },
-];
-
-const entradas = data.reduce((acc, item) => acc + item.entrada, 0);
-const saidas = data.reduce((acc, item) => acc + item.saida, 0);
-const saldo = entradas - saidas;
-const saldoAtual = data[data.length - 1].entrada - data[data.length - 1].saida;
-const saldoAnterior = data[data.length - 2].entrada - data[data.length - 2].saida;
-
-const diferenca = saldoAtual - saldoAnterior;
 export default function MonthlyView() {
+  const [data, setData] = useState<VisaoMensalResponse[]>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await getVisaoMensal();
+        const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+        const dataFormatada = meses.map((mes) => {
+            const item = response.find(
+              (r) => r.mes.replace(".", "").toLowerCase() === mes.toLowerCase()
+            );
+          return {
+            mes,
+            entrada: item?.entrada ?? 0,
+            saida: item?.saida ?? 0,
+          };
+        });
+        setData(dataFormatada);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const entradas = data.reduce((acc, item) => acc + item.entrada, 0);
+  const saidas = data.reduce((acc, item) => acc + item.saida, 0);
+  const saldo = entradas - saidas;
+  const saldoAtual =
+    data.length >= 1
+      ? (data[data.length - 1].entrada ?? 0) - (data[data.length - 1].saida ?? 0)
+      : 0;
+
+  const saldoAnterior =
+    data.length >= 2
+      ? (data[data.length - 2].entrada ?? 0) - (data[data.length - 2].saida ?? 0)
+      : 0;
+
+  const diferenca = saldoAtual - saldoAnterior;
+
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm">
       <h2 className="text-sm font-medium mb-2">Visão mensal</h2>
@@ -60,24 +79,12 @@ export default function MonthlyView() {
               ]}
               labelFormatter={(label) => `Mês: ${label}`}
             />
-            <Area
-              type="monotone"
-              dataKey="entrada"
-              stroke="none"
-              fill="url(#colorEntrada)"
-              activeDot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="saida"
-              stroke="#000"
-              strokeWidth={2}
-              dot={{ r: 4, fill: "#000" }}
-              activeDot={{ r: 6 }}
-            />
+            <Area type="monotone" dataKey="entrada" stroke="none" fill="url(#colorEntrada)" activeDot={false} />
+            <Line type="monotone" dataKey="saida" stroke="#000" strokeWidth={2} dot={{ r: 4, fill: "#000" }} activeDot={{ r: 6 }} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
+
       <div className="mt-4">
         <p className="text-lg font-semibold">
           Saldo: R$ {saldo.toLocaleString("pt-BR")}
