@@ -90,7 +90,7 @@ export const getGastosFuturos = async (): Promise<GastoFuturoResponse[]> => {
 
 export const getVisaoMensal = async (): Promise<VisaoMensalResponse[]> => {
   try {
-    const response = await api.get('/api/visao-mensal');
+    const response = await api.get('/api/transacao/visao-mensal');
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar visão mensal:', error);
