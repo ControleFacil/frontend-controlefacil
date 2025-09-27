@@ -37,6 +37,12 @@ export interface VisaoMensalResponse {
   entrada: number;
   saida: number;
 }
+export interface TransacaoRequest {
+  valor: number;
+  descricao: string;
+  tipo: "ENTRADA" | "SAIDA";
+  categoriaNome: string;
+}
 
 export const getMetas = async (): Promise<MetaResponse[]> => {
   try {
@@ -71,7 +77,8 @@ export const getCartao = async (): Promise<CartaoResponse> => {
 export const getTransacoes = async (limit: number = 5): Promise<TransacaoResponse[]> => {
   try {
     const response = await api.get(`/api/transacoes?limit=${limit}`);
-    return response.data;
+      return response.data;
+
   } catch (error) {
     console.error('Erro ao buscar transações:', error);
     throw new Error('Não foi possível carregar as transações');
@@ -87,6 +94,29 @@ export const getGastosFuturos = async (): Promise<GastoFuturoResponse[]> => {
     throw new Error('Não foi possível carregar os gastos futuros');
   }
 };
+
+export const getVisaoMensal = async (): Promise<VisaoMensalResponse[]> => {
+  try {
+    const response = await api.get('/api/transacao/visao-mensal');
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao buscar visão mensal:', error);
+    throw new Error('Não foi possível carregar a visão mensal');
+  }
+}; 
+
+export const getCategorias = async (): Promise<string[]> => {
+  try {
+    const response = await api.get("/api/transacao/categorias");
+    return response.data; 
+  } catch (error) {
+    console.error("Erro ao buscar categorias:", error);
+    throw new Error("Não foi possível carregar categorias");
+  }
+};
+
+
+// Posts
 export const createGastoFuturo = async (gasto: { descricao: string; valor: number; data: string }) => {
   try {
     const response = await api.post('/api/gastos-futuros', gasto);
@@ -96,14 +126,14 @@ export const createGastoFuturo = async (gasto: { descricao: string; valor: numbe
     throw new Error('Não foi possível criar o gasto futuro');
   }
 };
-
-
-export const getVisaoMensal = async (): Promise<VisaoMensalResponse[]> => {
+export const createTransacao = async (
+  transacao: TransacaoRequest
+): Promise<TransacaoResponse> => {
   try {
-    const response = await api.get('/api/transacao/visao-mensal');
+    const response = await api.post("/api/transacao", transacao);
     return response.data;
   } catch (error) {
-    console.error('Erro ao buscar visão mensal:', error);
-    throw new Error('Não foi possível carregar a visão mensal');
+    console.error("Erro ao criar transação:", error);
+    throw new Error("Não foi possível criar a transação");
   }
 };

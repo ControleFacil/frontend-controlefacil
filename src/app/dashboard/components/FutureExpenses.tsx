@@ -98,7 +98,7 @@ export default function FutureExpenses() {
             <h3 className="text-lg font-semibold mb-4">Adicionar Gasto Futuro</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
-                type="text"
+                type="text" 
                 placeholder="Descrição"
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
