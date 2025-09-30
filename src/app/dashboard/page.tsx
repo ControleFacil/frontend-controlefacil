@@ -10,19 +10,26 @@ import FutureExpenses from "./components/FutureExpenses";
 export default function DashboardPage() {
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar/>
+      <Sidebar />
       <main className="flex-1 p-6 overflow-y-auto">
-        <Header/>
-        <section className="grid grid-cols-3 gap-7">
-          <div className="col-span-2 space-y-10">
-            <Goals/>
-            <FinancialHealth/>
-             <MonthlyView/>
+        <Header />
+        <section
+          className="
+            grid gap-7
+            grid-cols-1
+            md:grid-cols-2
+            lg:grid-cols-3
+          "
+        >
+          <div className="space-y-10 md:col-span-2">
+            <Goals />
+            <FinancialHealth />
+            <MonthlyView />
           </div>
-          <div className="flex flex-col gap-10">
-            <CardInfo/>
-            <Transactions/>
-            <FutureExpenses/>
+          <div className="space-y-10 md:col-span-2 lg:col-span-1">
+            <CardInfo />
+            <Transactions />
+            <FutureExpenses />
           </div>
         </section>
       </main>

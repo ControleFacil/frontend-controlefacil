@@ -15,10 +15,8 @@ const Progress: React.FC<ProgressProps> = ({
   showPercentage = false,
   color = 'blue'
 }) => {
-  // Garantir que o valor esteja entre 0 e 100
   const progressValue = Math.min(100, Math.max(0, value));
-  
-  // Mapeamento de cores
+
   const colorMap = {
     blue: 'bg-blue-500',
     green: 'bg-green-500',

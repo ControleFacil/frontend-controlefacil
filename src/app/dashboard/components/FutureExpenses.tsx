@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getGastosFuturos, GastoFuturoResponse, createGastoFuturo } from "@/http/api/dashboard/dashboardService";
 
@@ -18,6 +18,7 @@ export default function FutureExpenses() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [openDetails, setOpenDetails] = useState(false);
 
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
@@ -47,7 +48,7 @@ export default function FutureExpenses() {
       setValor('');
       setData('');
       setOpen(false);
-      fetchGastos(); // Recarrega a lista
+      fetchGastos();
     } catch (err) {
       console.error(err);
       alert('Erro ao criar gasto futuro');
@@ -65,12 +66,16 @@ export default function FutureExpenses() {
           >
             <Plus className="w-4 h-4" />
           </button>
-          <button className="flex items-center gap-2 text-purple-600 font-medium">
+          <button 
+            onClick={() => setOpenDetails(true)} 
+            className="flex items-center gap-2 text-purple-600 font-medium"
+          >
             Detalhes <ArrowRight size={16} />
           </button>
         </div>
       </div>
 
+      {/* Lista resumida */}
       <div className="space-y-3">
         {gastos.map((gasto, i) => (
           <div
@@ -92,8 +97,9 @@ export default function FutureExpenses() {
         ))}
       </div>
 
+      {/* Modal de adicionar gasto */}
       {open && (
-        <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 backdrop-blur-sm">
           <div className="bg-white p-6 rounded-lg w-96">
             <h3 className="text-lg font-semibold mb-4">Adicionar Gasto Futuro</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -137,6 +143,44 @@ export default function FutureExpenses() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de detalhes gerais */}
+      {openDetails && (
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 backdrop-blur-sm">
+          <div className="bg-white p-6 rounded-lg w-[600px] max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Detalhes dos Gastos Futuros</h3>
+              <button onClick={() => setOpenDetails(false)} className="text-gray-500 hover:text-gray-700">
+                <X size={20} />
+              </button>
+            </div>
+
+            <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+              <thead>
+                <tr className="bg-purple-100 text-left">
+                  <th className="p-2">Descrição</th>
+                  <th className="p-2">Valor</th>
+                  <th className="p-2">Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                {gastos.map((gasto) => (
+                  <tr key={gasto.id} className="border-t">
+                    <td className="p-2">{gasto.descricao}</td>
+                    <td className="p-2 text-red-500 font-semibold">
+                      R$ {Math.abs(gasto.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="p-2">
+                      {new Date(gasto.data).toLocaleDateString('pt-BR')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
           </div>
         </div>
       )}

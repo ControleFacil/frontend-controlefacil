@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Progress from './ui/progress';
-import { getMetas, MetaResponse } from '@/http/api/dashboard/dashboardService';
+import { getMetas,updateMetaValor } from '@/http/api/dashboard/dashboardService';
 
 interface Goal {
   id: string;
@@ -16,6 +16,7 @@ export default function Goals() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [customAmounts, setCustomAmounts] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     const fetchMetas = async () => {
@@ -51,12 +52,27 @@ export default function Goals() {
     return Math.round((current / target) * 100);
   };
 
-  const addToGoal = (id: string, amount: number) => {
-    setGoals(goals.map(goal => 
-      goal.id === id 
-        ? { ...goal, currentAmount: Math.min(goal.targetAmount, goal.currentAmount + amount) } 
-        : goal
-    ));
+
+const addToGoal = async (id: string, amount: number) => {
+  try {
+    const goal = goals.find((g) => g.id === id);
+    if (!goal) return;
+
+    const novoValor = Math.min(goal.targetAmount, goal.currentAmount + amount);
+
+    const updated = await updateMetaValor(id, novoValor);
+
+    setGoals(goals.map((g) => (g.id === id ? { ...g, currentAmount: updated.atual } : g)));
+  } catch (err) {
+    console.error('Erro ao atualizar meta:', err);
+  }
+};
+
+  const handleCustomChange = (id: string, value: string) => {
+    setCustomAmounts({
+      ...customAmounts,
+      [id]: Number(value) || 0
+    });
   };
 
   if (loading) {
@@ -102,7 +118,8 @@ export default function Goals() {
       <div className="space-y-4">
         {goals.map((goal) => {
           const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
-          
+          const customValue = customAmounts[goal.id] || 0;
+
           return (
             <div key={goal.id}>
               <div className="flex justify-between items-center mb-1">
@@ -114,7 +131,7 @@ export default function Goals() {
               <Progress value={progress} className="h-2" color={goal.color} />
               <div className="flex justify-between items-center mt-1">
                 <span className="text-xs text-gray-500">{progress}% concluído</span>
-                <div className="flex space-x-1">
+                <div className="flex space-x-1 items-center">
                   <button 
                     onClick={() => addToGoal(goal.id, 100)}
                     className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
@@ -127,6 +144,28 @@ export default function Goals() {
                   >
                     +500
                   </button>
+                  <input
+                    type="number"
+                    value={customValue}
+                    onChange={(e) => handleCustomChange(goal.id, e.target.value)}
+                    className="w-16 text-xs px-1 py-0.5 border rounded text-center"
+                    placeholder="+..."
+                  />
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => addToGoal(goal.id, Math.abs(Number(customValue)))}
+                      className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 transition"
+                    >
+                      + OK
+                    </button>
+
+                    <button 
+                      onClick={() => addToGoal(goal.id, -Math.abs(Number(customValue)))}
+                      className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+                    >
+                      - OK
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

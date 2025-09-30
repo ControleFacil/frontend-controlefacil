@@ -30,6 +30,7 @@ export interface GastoFuturoResponse {
   id: string;
   descricao: string;
   valor: number;
+  data: string;
 }
 
 export interface VisaoMensalResponse {
@@ -135,5 +136,19 @@ export const createTransacao = async (
   } catch (error) {
     console.error("Erro ao criar transação:", error);
     throw new Error("Não foi possível criar a transação");
+  }
+  
+};
+//Patch
+export const updateMetaValor = async (
+  id: string,
+  valor: number
+): Promise<MetaResponse> => {
+  try {
+    const response = await api.patch(`/api/metas/${id}/valor`, { valor });
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizar valor da meta:', error);
+    throw new Error('Não foi possível atualizar o valor da meta');
   }
 };
