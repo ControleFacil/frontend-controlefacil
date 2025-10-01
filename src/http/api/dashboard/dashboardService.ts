@@ -6,8 +6,6 @@ export interface MetaResponse {
   atual: number;
   meta: number;
 }
-
-
 export interface SaudeFinanceiraResponse {
   percentual: number;
 }
@@ -23,6 +21,7 @@ export interface TransacaoResponse {
   id: string;
   descricao: string;
   valor: number;
+  categoriaNome: string;
   hora: string;
 }
 
@@ -43,6 +42,12 @@ export interface TransacaoRequest {
   descricao: string;
   tipo: "ENTRADA" | "SAIDA";
   categoriaNome: string;
+}
+export interface MetaRequest {
+  descricao: string;
+  valorObjetivo: number;
+  valorAtual: number;
+  dataLimite: string; // formato "YYYY-MM-DD"
 }
 
 export const getMetas = async (): Promise<MetaResponse[]> => {
@@ -137,8 +142,19 @@ export const createTransacao = async (
     console.error("Erro ao criar transação:", error);
     throw new Error("Não foi possível criar a transação");
   }
-  
 };
+export const createMeta = async (
+  meta: MetaRequest
+): Promise<MetaResponse> => {
+  try {
+    const response = await api.post("/api/metas", meta);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao criar meta:", error);
+    throw new Error("Não foi possível criar a meta");
+  }
+};
+
 //Patch
 export const updateMetaValor = async (
   id: string,
@@ -152,3 +168,49 @@ export const updateMetaValor = async (
     throw new Error('Não foi possível atualizar o valor da meta');
   }
 };
+// Puts
+export const updateTransacao = async (
+  id: string,
+  transacao: TransacaoRequest
+): Promise<TransacaoResponse> => {
+  try {
+    const response = await api.put(`/api/transacao/${id}`, transacao);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar transação:", error);
+    throw new Error("Não foi possível atualizar a transação");
+  }
+};
+
+export const updateMeta = async (
+  id: string,
+  meta: MetaRequest
+): Promise<MetaResponse> => {
+  try {
+    const response = await api.put(`/api/metas/${id}`, meta);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar meta:", error);
+    throw new Error("Não foi possível atualizar a meta");
+  }
+};
+
+
+// Deletes
+export const deleteTransacao = async (id: string): Promise<void> => {
+  try {
+    await api.delete(`/api/transacao/${id}`);
+  } catch (error) {
+    console.error("Erro ao deletar transação:", error);
+    throw new Error("Não foi possível deletar a transação");
+  }
+};
+export const deleteMeta = async (id: string): Promise<void> => {
+  try {
+    await api.delete(`/api/metas/${id}`);
+  } catch (error) {
+    console.error("Erro ao deletar meta:", error);
+    throw new Error("Não foi possível deletar a meta");
+  }
+};
+

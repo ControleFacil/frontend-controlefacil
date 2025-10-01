@@ -1,8 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import Progress from './ui/progress';
-import { getMetas,updateMetaValor } from '@/http/api/dashboard/dashboardService';
+import {
+  getMetas,
+  createMeta,
+  updateMeta,
+  deleteMeta,
+  updateMetaValor,
+  MetaResponse,
+} from '@/http/api/dashboard/dashboardService';
 
 interface Goal {
   id: string;
@@ -18,25 +26,42 @@ export default function Goals() {
   const [error, setError] = useState<string | null>(null);
   const [customAmounts, setCustomAmounts] = useState<{ [key: string]: number }>({});
 
+  // Estados separados
+  const [editing, setEditing] = useState<Goal | null>(null);
+  const [creating, setCreating] = useState(false);
+
+  // Form para criar
+  const [createForm, setCreateForm] = useState({
+    descricao: '',
+    valorObjetivo: 0,
+    dataLimite: '',
+  });
+
+  // Form para editar
+  const [editForm, setEditForm] = useState({
+    descricao: '',
+    valorObjetivo: 0,
+    valorAtual: 0,
+    dataLimite: '',
+  });
+
   useEffect(() => {
     const fetchMetas = async () => {
       try {
         setLoading(true);
         const metasData = await getMetas();
-        
-        const mappedGoals: Goal[] = metasData.map((meta, index) => {
-          const colors: ('blue' | 'green' | 'red' | 'yellow' | 'purple')[] = 
-            ['green', 'blue', 'purple', 'red', 'yellow'];
-          
-          return {
-            id: meta.id,
-            title: meta.titulo,
-            targetAmount: meta.meta,
-            currentAmount: meta.atual,
-            color: colors[index % colors.length]
-          };
-        });
-        
+
+        const colors: ('green' | 'blue' | 'purple' | 'red' | 'yellow')[] = 
+          ['green', 'blue', 'purple', 'red', 'yellow'];
+
+        const mappedGoals: Goal[] = metasData.map((meta: MetaResponse, index) => ({
+          id: meta.id,
+          title: meta.titulo,
+          targetAmount: meta.meta,
+          currentAmount: meta.atual,
+          color: colors[index % colors.length],
+        }));
+
         setGoals(mappedGoals);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro ao carregar metas');
@@ -52,68 +77,128 @@ export default function Goals() {
     return Math.round((current / target) * 100);
   };
 
+  const addToGoal = async (id: string, amount: number) => {
+    try {
+      const goal = goals.find((g) => g.id === id);
+      if (!goal) return;
 
-const addToGoal = async (id: string, amount: number) => {
-  try {
-    const goal = goals.find((g) => g.id === id);
-    if (!goal) return;
+      const novoValor = Math.min(goal.targetAmount, goal.currentAmount + amount);
 
-    const novoValor = Math.min(goal.targetAmount, goal.currentAmount + amount);
+      const updated = await updateMetaValor(id, novoValor);
 
-    const updated = await updateMetaValor(id, novoValor);
-
-    setGoals(goals.map((g) => (g.id === id ? { ...g, currentAmount: updated.atual } : g)));
-  } catch (err) {
-    console.error('Erro ao atualizar meta:', err);
-  }
-};
+      setGoals(
+        goals.map((g) =>
+          g.id === id ? { ...g, currentAmount: updated.atual } : g
+        )
+      );
+    } catch (err) {
+      console.error('Erro ao atualizar meta:', err);
+    }
+  };
 
   const handleCustomChange = (id: string, value: string) => {
     setCustomAmounts({
       ...customAmounts,
-      [id]: Number(value) || 0
+      [id]: Number(value) || 0,
     });
   };
 
-  if (loading) {
-    return (
-      <section className="bg-white shadow-md rounded-2xl p-6 animate-pulse">
-        <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i}>
-              <div className="flex justify-between items-center mb-1">
-                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-              </div>
-              <div className="w-full h-2 bg-gray-200 rounded-full"></div>
-              <div className="flex justify-between items-center mt-1">
-                <div className="h-3 bg-gray-200 rounded w-1/6"></div>
-                <div className="flex space-x-1">
-                  <div className="h-6 bg-gray-200 rounded w-10"></div>
-                  <div className="h-6 bg-gray-200 rounded w-10"></div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  }
+  // ====================== CREATE ======================
+  const handleCreate = async () => {
+    if (createForm.valorObjetivo <= 0) {
+      alert('O valor objetivo deve ser maior que zero.');
+      return;
+    }
 
-  if (error) {
-    return (
-      <section className="bg-white shadow-md rounded-2xl p-6">
-        <div className="text-red-500 text-center">
-          Erro ao carregar metas: {error}
-        </div>
-      </section>
-    );
-  }
+    try {
+      const payload = {
+        descricao: createForm.descricao,
+        valorObjetivo: createForm.valorObjetivo,
+        valorAtual: 0,
+        dataLimite: createForm.dataLimite,
+      };
+
+      const created = await createMeta(payload);
+
+      setGoals([
+        ...goals,
+        {
+          id: created.id,
+          title: created.titulo,
+          targetAmount: created.meta,
+          currentAmount: created.atual,
+        },
+      ]);
+
+      setCreating(false);
+      setCreateForm({ descricao: '', valorObjetivo: 0, dataLimite: '' });
+    } catch (err) {
+      console.error('Erro ao criar meta:', err);
+    }
+  };
+
+  // ====================== EDIT ======================
+  const handleUpdate = async () => {
+    if (!editing) return;
+
+    if (editForm.valorObjetivo < editForm.valorAtual) {
+      alert('O valor objetivo não pode ser menor que o valor atual.');
+      return;
+    }
+
+    try {
+      const payload = {
+        descricao: editForm.descricao,
+        valorObjetivo: editForm.valorObjetivo,
+        valorAtual: editForm.valorAtual,
+        dataLimite: editForm.dataLimite,
+      };
+
+      const updated = await updateMeta(editing.id, payload);
+
+      setGoals(goals.map((g) => (g.id === editing.id ? { ...g, ...updated } : g)));
+      setEditing(null);
+    } catch (err) {
+      console.error('Erro ao atualizar meta:', err);
+    }
+  };
+
+  const handleEdit = (goal: Goal) => {
+    setEditing(goal);
+    setEditForm({
+      descricao: goal.title,
+      valorObjetivo: goal.targetAmount,
+      valorAtual: goal.currentAmount,
+      dataLimite: '', // ajustar se API devolver data
+    });
+  };
+
+  // ====================== DELETE ======================
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta meta?')) return;
+    try {
+      await deleteMeta(id);
+      setGoals(goals.filter((g) => g.id !== id));
+    } catch (err) {
+      console.error('Erro ao deletar meta:', err);
+    }
+  };
+
+  // ====================== RENDER ======================
+  if (loading) return <p>Carregando...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <section className="bg-white shadow-md rounded-2xl p-6">
-      <h2 className="text-lg font-semibold text-black mb-4">Metas</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold text-black">Metas</h2>
+        <button
+          onClick={() => setCreating(true)}
+          className="flex items-center gap-2 bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700"
+        >
+          <Plus size={16} /> Adicionar Meta
+        </button>
+      </div>
 
       <div className="space-y-4">
         {goals.map((goal) => {
@@ -121,24 +206,32 @@ const addToGoal = async (id: string, amount: number) => {
           const customValue = customAmounts[goal.id] || 0;
 
           return (
-            <div key={goal.id}>
+            <div key={goal.id} className="p-3 border rounded-lg">
               <div className="flex justify-between items-center mb-1">
                 <p className="text-sm text-gray-600">{goal.title}</p>
-                <span className="text-xs text-gray-500">
-                  R$ {goal.currentAmount.toLocaleString('pt-BR')} / R$ {goal.targetAmount.toLocaleString('pt-BR')}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">
+                    R$ {goal.currentAmount.toLocaleString('pt-BR')} / R$ {goal.targetAmount.toLocaleString('pt-BR')}
+                  </span>
+                  <button onClick={() => handleEdit(goal)} className="text-blue-500 hover:text-blue-700">
+                    <Pencil size={16} />
+                  </button>
+                  <button onClick={() => handleDelete(goal.id)} className="text-red-500 hover:text-red-700">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
               <Progress value={progress} className="h-2" color={goal.color} />
               <div className="flex justify-between items-center mt-1">
                 <span className="text-xs text-gray-500">{progress}% concluído</span>
                 <div className="flex space-x-1 items-center">
-                  <button 
+                  <button
                     onClick={() => addToGoal(goal.id, 100)}
                     className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
                   >
                     +100
                   </button>
-                  <button 
+                  <button
                     onClick={() => addToGoal(goal.id, 500)}
                     className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
                   >
@@ -152,14 +245,13 @@ const addToGoal = async (id: string, amount: number) => {
                     placeholder="+..."
                   />
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => addToGoal(goal.id, Math.abs(Number(customValue)))}
                       className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 transition"
                     >
                       + OK
                     </button>
-
-                    <button 
+                    <button
                       onClick={() => addToGoal(goal.id, -Math.abs(Number(customValue)))}
                       className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
                     >
@@ -173,27 +265,98 @@ const addToGoal = async (id: string, amount: number) => {
         })}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-gray-100">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Resumo</h3>
-        <div className="grid grid-cols-3 gap-2 text-xs">
-          <div className="p-2 bg-blue-50 rounded text-center">
-            <p className="text-gray-600">Total</p>
-            <p className="font-semibold">R$ {goals.reduce((acc, goal) => acc + goal.currentAmount, 0).toLocaleString('pt-BR')}</p>
-          </div>
-          <div className="p-2 bg-green-50 rounded text-center">
-            <p className="text-gray-600">Concluído</p>
-            <p className="font-semibold">
-              {Math.round(goals.reduce((acc, goal) => acc + goal.currentAmount, 0) / goals.reduce((acc, goal) => acc + goal.targetAmount, 0) * 100)}%
-            </p>
-          </div>
-          <div className="p-2 bg-purple-50 rounded text-center">
-            <p className="text-gray-600">Restante</p>
-            <p className="font-semibold">
-              R$ {goals.reduce((acc, goal) => acc + (goal.targetAmount - goal.currentAmount), 0).toLocaleString('pt-BR')}
-            </p>
+      {/* Modal Criar */}
+      {creating && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-96 relative">
+            <button
+              onClick={() => setCreating(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <X size={20} />
+            </button>
+            <h2 className="text-lg font-semibold mb-4">Nova Meta</h2>
+            <div className="space-y-3">
+              <input
+                type="text"
+                value={createForm.descricao}
+                onChange={(e) => setCreateForm({ ...createForm, descricao: e.target.value })}
+                className="w-full border rounded p-2 text-sm"
+                placeholder="Descrição"
+              />
+              <input
+                type="number"
+                value={createForm.valorObjetivo}
+                onChange={(e) => setCreateForm({ ...createForm, valorObjetivo: Number(e.target.value) })}
+                className="w-full border rounded p-2 text-sm"
+                placeholder="Valor objetivo"
+              />
+              <input
+                type="date"
+                value={createForm.dataLimite}
+                onChange={(e) => setCreateForm({ ...createForm, dataLimite: e.target.value })}
+                className="w-full border rounded p-2 text-sm"
+              />
+              <button
+                onClick={handleCreate}
+                className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
+              >
+                Salvar
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Modal Editar */}
+      {editing && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-96 relative">
+            <button
+              onClick={() => setEditing(null)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <X size={20} />
+            </button>
+            <h2 className="text-lg font-semibold mb-4">Editar Meta</h2>
+            <div className="space-y-3">
+              <input
+                type="text"
+                value={editForm.descricao}
+                onChange={(e) => setEditForm({ ...editForm, descricao: e.target.value })}
+                className="w-full border rounded p-2 text-sm"
+                placeholder="Descrição"
+              />
+              <input
+                type="number"
+                value={editForm.valorObjetivo}
+                onChange={(e) => setEditForm({ ...editForm, valorObjetivo: Number(e.target.value) })}
+                className="w-full border rounded p-2 text-sm"
+                placeholder="Valor objetivo"
+              />
+              <input
+                type="number"
+                value={editForm.valorAtual}
+                disabled
+                className="w-full border rounded p-2 text-sm bg-gray-100"
+                placeholder="Valor atual"
+              />
+              <input
+                type="date"
+                value={editForm.dataLimite}
+                onChange={(e) => setEditForm({ ...editForm, dataLimite: e.target.value })}
+                className="w-full border rounded p-2 text-sm"
+              />
+              <button
+                onClick={handleUpdate}
+                className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
+              >
+                Atualizar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
