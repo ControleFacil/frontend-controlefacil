@@ -12,9 +12,10 @@ export interface SaudeFinanceiraResponse {
 
 export interface CartaoResponse {
   id: string;
-  descricao: string;
-  valor: string;
-  hora: string;
+  numeroMascarado: string;
+  validade: string;       
+  nomeTitular: string; 
+  bandeira: string;        
 }
 
 export interface TransacaoResponse {
@@ -47,7 +48,14 @@ export interface MetaRequest {
   descricao: string;
   valorObjetivo: number;
   valorAtual: number;
-  dataLimite: string; // formato "YYYY-MM-DD"
+  dataLimite: string; 
+}
+
+export interface CartaoRequest {
+  numero: string;      
+  nomeTitular: string;
+  validade: string;    
+  bandeira: string;
 }
 
 export const getMetas = async (): Promise<MetaResponse[]> => {
@@ -70,13 +78,13 @@ export const getSaudeFinanceira = async (): Promise<SaudeFinanceiraResponse> => 
   }
 };
 
-export const getCartao = async (): Promise<CartaoResponse> => {
+export const getCartoes = async (): Promise<CartaoResponse[]> => {
   try {
-    const response = await api.get('/api/cartao');
-    return response.data;
+    const { data } = await api.get<CartaoResponse[]>('/api/cartoes');
+    return data;
   } catch (error) {
-    console.error('Erro ao buscar informações do cartão:', error);
-    throw new Error('Não foi possível carregar as informações do cartão');
+    console.error('Erro ao buscar cartões:', error);
+    throw new Error('Não foi possível carregar os cartões');
   }
 };
 
@@ -155,6 +163,17 @@ export const createMeta = async (
   }
 };
 
+export const createCartao = async (cartao: CartaoRequest): Promise<CartaoResponse> => {
+  try{
+  const { data } = await api.post("/api/cartoes", cartao);
+  return data;
+  } catch(error){
+    console.error("Erro ao criar cartão:", error);
+    throw new Error("Não foi possível criar o cartão");
+  }
+};
+
+
 //Patch
 export const updateMetaValor = async (
   id: string,
@@ -195,6 +214,16 @@ export const updateMeta = async (
   }
 };
 
+export const updateCartao = async (id: string, cartao: CartaoRequest): Promise<CartaoResponse> => {
+  try{
+  const { data } = await api.put(`/api/cartoes/${id}`, cartao);
+  return data;
+  } catch(error){
+    console.error("Erro ao atualizar cartão:", error);
+    throw new Error("Não foi possível atualizar o cartão");
+  }
+};
+
 
 // Deletes
 export const deleteTransacao = async (id: string): Promise<void> => {
@@ -211,6 +240,15 @@ export const deleteMeta = async (id: string): Promise<void> => {
   } catch (error) {
     console.error("Erro ao deletar meta:", error);
     throw new Error("Não foi possível deletar a meta");
+  }
+};
+
+export const deleteCartao = async (id: string): Promise<void> => {
+  try{
+    await api.delete(`/api/cartoes/${id}`);
+  } catch(error){
+    console.error("Erro ao deletar cartão:", error);
+    throw new Error("Não foi possível deletar o cartão");
   }
 };
 
