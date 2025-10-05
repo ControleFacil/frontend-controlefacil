@@ -1,8 +1,14 @@
 'use client';
 
-import { ArrowRight, Plus, X } from "lucide-react";
+import { ArrowRight, Plus, X, Trash2, NotebookPen } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getGastosFuturos, GastoFuturoResponse, createGastoFuturo } from "@/http/api/dashboard/dashboardService";
+import { 
+  getGastosFuturos, 
+  createGastoFuturo, 
+  updateGastoFuturo, 
+  deleteGastoFuturo, 
+  GastoFuturoResponse 
+} from "@/http/api/dashboard/dashboardService";
 
 const getInitials = (label: string): string => {
   return label.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
@@ -19,6 +25,7 @@ export default function FutureExpenses() {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [openDetails, setOpenDetails] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
@@ -42,16 +49,49 @@ export default function FutureExpenses() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const body = {
+      descricao,
+      valor: parseFloat(valor),
+      data
+    };
+
     try {
-      await createGastoFuturo({ descricao, valor: parseFloat(valor), data });
+      if (editingId) {
+        await updateGastoFuturo(editingId, body);
+      } else {
+        await createGastoFuturo(body);
+      }
       setDescricao('');
       setValor('');
       setData('');
+      setEditingId(null);
       setOpen(false);
       fetchGastos();
     } catch (err) {
       console.error(err);
-      alert('Erro ao criar gasto futuro');
+      alert('Erro ao salvar gasto futuro');
+    }
+  };
+
+  const handleEdit = (gasto: GastoFuturoResponse) => {
+    setDescricao(gasto.descricao);
+    setValor(String(gasto.valor));
+    setData(gasto.data.split('T')[0]);
+    setEditingId(gasto.id);
+    setOpen(true);
+    setOpenDetails(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Deseja realmente excluir este gasto futuro?')) {
+      try {
+        await deleteGastoFuturo(id);
+        fetchGastos();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao excluir gasto futuro');
+      }
     }
   };
 
@@ -60,8 +100,8 @@ export default function FutureExpenses() {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Gastos Futuros</h2>
         <div className="flex items-center gap-4">
-          <button
-            onClick={() => setOpen(true)}
+          <button 
+            onClick={() => setOpen(true)} 
             className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
           >
             <Plus className="w-4 h-4" />
@@ -90,18 +130,28 @@ export default function FutureExpenses() {
               </div>
               <span className="font-medium">{gasto.descricao}</span>
             </div>
-            <span className="text-red-500 font-semibold">
-              R$ {Math.abs(gasto.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-red-500 font-semibold">
+                R$ {Math.abs(gasto.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </span>
+              <button onClick={() => handleEdit(gasto)} className="text-purple-600 hover:text-purple-800">
+                <NotebookPen size={18} />
+              </button>
+              <button onClick={() => handleDelete(gasto.id)} className="text-red-500 hover:text-red-700">
+                <Trash2 size={18} />
+              </button>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Modal de adicionar gasto */}
+      {/* Modal de adicionar/editar gasto */}
       {open && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 backdrop-blur-sm">
           <div className="bg-white p-6 rounded-lg w-96">
-            <h3 className="text-lg font-semibold mb-4">Adicionar Gasto Futuro</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              {editingId ? 'Editar Gasto Futuro' : 'Adicionar Gasto Futuro'}
+            </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text" 
@@ -130,7 +180,7 @@ export default function FutureExpenses() {
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setOpen(false)}
+                  onClick={() => { setOpen(false); setEditingId(null); }}
                   className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
                 >
                   Cancelar
@@ -147,7 +197,7 @@ export default function FutureExpenses() {
         </div>
       )}
 
-      {/* Modal de detalhes gerais */}
+      {/* Modal de detalhes */}
       {openDetails && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 backdrop-blur-sm">
           <div className="bg-white p-6 rounded-lg w-[600px] max-h-[80vh] overflow-y-auto">
@@ -164,11 +214,12 @@ export default function FutureExpenses() {
                   <th className="p-2">Descrição</th>
                   <th className="p-2">Valor</th>
                   <th className="p-2">Data</th>
+                  <th className="p-2 text-center">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {gastos.map((gasto) => (
-                  <tr key={gasto.id} className="border-t">
+                  <tr key={gasto.id} className="border-t hover:bg-purple-50">
                     <td className="p-2">{gasto.descricao}</td>
                     <td className="p-2 text-red-500 font-semibold">
                       R$ {Math.abs(gasto.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -176,11 +227,18 @@ export default function FutureExpenses() {
                     <td className="p-2">
                       {new Date(gasto.data).toLocaleDateString('pt-BR')}
                     </td>
+                    <td className="p-2 flex justify-center gap-2">
+                      <button onClick={() => handleEdit(gasto)} className="text-purple-600 hover:text-purple-800">
+                        <NotebookPen size={18} />
+                      </button>
+                      <button onClick={() => handleDelete(gasto.id)} className="text-red-500 hover:text-red-700">
+                        <Trash2 size={18} />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-
           </div>
         </div>
       )}

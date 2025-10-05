@@ -5,6 +5,7 @@ export interface MetaResponse {
   titulo: string;
   atual: number;
   meta: number;
+  dataLimite: string; 
 }
 export interface SaudeFinanceiraResponse {
   percentual: number;
@@ -223,6 +224,18 @@ export const updateCartao = async (id: string, cartao: CartaoRequest): Promise<C
     throw new Error("Não foi possível atualizar o cartão");
   }
 };
+export const updateGastoFuturo = async (
+  id: string,
+  gasto: { descricao: string; valor: number; data: string }
+): Promise<GastoFuturoResponse> => {
+  try {
+    const response = await api.put(`/api/gastos-futuros/${id}`, gasto);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar gasto futuro:", error);
+    throw new Error("Não foi possível atualizar o gasto futuro");
+  }
+};
 
 
 // Deletes
@@ -251,4 +264,11 @@ export const deleteCartao = async (id: string): Promise<void> => {
     throw new Error("Não foi possível deletar o cartão");
   }
 };
-
+export const deleteGastoFuturo = async (id: string): Promise<void> => {
+  try {
+    await api.delete(`/api/gastos-futuros/${id}`);
+  } catch (error) {
+    console.error("Erro ao deletar gasto futuro:", error);
+    throw new Error("Não foi possível deletar o gasto futuro");
+  }
+};

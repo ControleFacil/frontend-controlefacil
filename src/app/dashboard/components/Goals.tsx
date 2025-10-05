@@ -17,6 +17,7 @@ interface Goal {
   title: string;
   targetAmount: number;
   currentAmount: number;
+  dataLimite: string;
   color?: 'blue' | 'green' | 'red' | 'yellow' | 'purple';
 }
 
@@ -59,6 +60,7 @@ export default function Goals() {
           title: meta.titulo,
           targetAmount: meta.meta,
           currentAmount: meta.atual,
+          dataLimite: meta.dataLimite,
           color: colors[index % colors.length],
         }));
 
@@ -103,59 +105,66 @@ export default function Goals() {
     });
   };
 
-  // ====================== CREATE ======================
+
   const handleCreate = async () => {
-    if (createForm.valorObjetivo <= 0) {
-      alert('O valor objetivo deve ser maior que zero.');
+      const { descricao, valorObjetivo, dataLimite } = createForm;
+
+      if (!descricao.trim() || !dataLimite.trim() || valorObjetivo <= 0) {
+        alert('Preencha todos os campos obrigatórios corretamente.');
+        return;
+      }
+
+      try {
+        const payload = {
+          descricao: descricao.trim(),
+          valorObjetivo,
+          valorAtual: 0,
+          dataLimite: dataLimite.trim(),
+        };
+
+        const created = await createMeta(payload);
+
+        setGoals([
+          ...goals,
+          {
+            id: created.id,
+            title: created.titulo,
+            targetAmount: created.meta,
+            currentAmount: created.atual,
+            dataLimite: created.dataLimite,
+          },
+        ]);
+
+        setCreating(false);
+        setCreateForm({ descricao: '', valorObjetivo: 0, dataLimite: '' });
+      } catch (err) {
+        console.error('Erro ao criar meta:', err);
+      }
+  };
+
+  const handleUpdate = async () => {
+    if (!editing) return;
+    const { descricao, valorObjetivo, valorAtual, dataLimite } = editForm;
+
+    if (!descricao.trim() || !dataLimite.trim() || valorObjetivo <= 0) {
+      alert('Preencha todos os campos obrigatórios corretamente.');
       return;
     }
 
-    try {
-      const payload = {
-        descricao: createForm.descricao,
-        valorObjetivo: createForm.valorObjetivo,
-        valorAtual: 0,
-        dataLimite: createForm.dataLimite,
-      };
-
-      const created = await createMeta(payload);
-
-      setGoals([
-        ...goals,
-        {
-          id: created.id,
-          title: created.titulo,
-          targetAmount: created.meta,
-          currentAmount: created.atual,
-        },
-      ]);
-
-      setCreating(false);
-      setCreateForm({ descricao: '', valorObjetivo: 0, dataLimite: '' });
-    } catch (err) {
-      console.error('Erro ao criar meta:', err);
-    }
-  };
-
-  // ====================== EDIT ======================
-  const handleUpdate = async () => {
-    if (!editing) return;
-
-    if (editForm.valorObjetivo < editForm.valorAtual) {
+    if (valorObjetivo < valorAtual) {
       alert('O valor objetivo não pode ser menor que o valor atual.');
       return;
     }
 
     try {
       const payload = {
-        descricao: editForm.descricao,
-        valorObjetivo: editForm.valorObjetivo,
-        valorAtual: editForm.valorAtual,
-        dataLimite: editForm.dataLimite,
+        descricao: descricao.trim(),
+        valorObjetivo,
+        valorAtual,
+        dataLimite: dataLimite.trim(),
       };
 
       const updated = await updateMeta(editing.id, payload);
-
       setGoals(goals.map((g) => (g.id === editing.id ? { ...g, ...updated } : g)));
       setEditing(null);
     } catch (err) {
@@ -169,11 +178,10 @@ export default function Goals() {
       descricao: goal.title,
       valorObjetivo: goal.targetAmount,
       valorAtual: goal.currentAmount,
-      dataLimite: '', // ajustar se API devolver data
+      dataLimite: goal.dataLimite || '',
     });
   };
 
-  // ====================== DELETE ======================
   const handleDelete = async (id: string) => {
     if (!confirm('Tem certeza que deseja excluir esta meta?')) return;
     try {
@@ -184,7 +192,6 @@ export default function Goals() {
     }
   };
 
-  // ====================== RENDER ======================
   if (loading) return <p>Carregando...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
@@ -299,7 +306,18 @@ export default function Goals() {
               />
               <button
                 onClick={handleCreate}
-                className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
+                disabled={
+                  !createForm.descricao.trim() ||
+                  !createForm.dataLimite.trim() ||
+                  createForm.valorObjetivo <= 0
+                }
+                className={`w-full py-2 rounded transition ${
+                  !createForm.descricao.trim() ||
+                  !createForm.dataLimite.trim() ||
+                  createForm.valorObjetivo <= 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
               >
                 Salvar
               </button>
@@ -349,7 +367,18 @@ export default function Goals() {
               />
               <button
                 onClick={handleUpdate}
-                className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
+                disabled={
+                  !editForm.descricao.trim() ||
+                  !editForm.dataLimite.trim() ||
+                  editForm.valorObjetivo <= 0
+                }
+                className={`w-full py-2 rounded transition ${
+                  !editForm.descricao.trim() ||
+                  !editForm.dataLimite.trim() ||
+                  editForm.valorObjetivo <= 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
               >
                 Atualizar
               </button>
