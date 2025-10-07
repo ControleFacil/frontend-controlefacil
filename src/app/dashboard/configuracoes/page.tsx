@@ -36,7 +36,7 @@ export default function ConfiguracoesUsuario() {
         {/* Cabeçalho */}
         <div className="flex items-center gap-3 mb-6">
           <Image
-            src="/assets/avatar.png"
+            src="/assets/2pac.jpg"
             alt="Foto do usuário"
             width={55}
             height={55}

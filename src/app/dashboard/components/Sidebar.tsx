@@ -7,7 +7,7 @@ import { LayoutGrid, CreditCard, History, Settings, Sun, Moon } from "lucide-rea
 const menuItems = [
   { name: "Dashboard", icon: LayoutGrid, href: "/dashboard" },
   { name: "Pagamentos", icon: CreditCard, href: "/dashboard/pagamentos" },
-  { name: "Histórico", icon: History, href: "/dashboard/historicos" },
+  { name: "Histórico", icon: History, href: "/dashboard/historico" },
   { name: "Serviços", icon: Settings, href: "/dashboard/servicos" },
   { name: "Configurações", icon: Settings, href: "/dashboard/configuracoes" },
 ];
