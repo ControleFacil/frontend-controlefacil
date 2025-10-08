@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/",
-  timeout: 150000, // 150 segundos
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080",
+  timeout: 150000, 
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -10,7 +10,7 @@ export const api = axios.create({
   withCredentials: false,
 });
 
-const publicEndpoints = ["/users", "/login"];
+const publicEndpoints = ["/auth/login", "/auth/register", "/users"];
 
 api.interceptors.request.use((config) => {
   const isPublic = publicEndpoints.some((endpoint) =>
@@ -26,6 +26,10 @@ api.interceptors.request.use((config) => {
     }
   }
 
+  if (process.env.NODE_ENV === "development") {
+    console.info(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+  }
+
   return config;
 });
 
@@ -34,6 +38,7 @@ api.interceptors.response.use(
   (error) => {
     const { response, request, config } = error;
 
+    // 404: recurso não encontrado
     if (response && response.status === 404) {
       console.warn(`404 - Recurso não encontrado em: ${config.url}`);
       return Promise.resolve({
@@ -44,12 +49,14 @@ api.interceptors.response.use(
       });
     }
 
+    // Timeout ou sem resposta
     if (error.code === "ECONNABORTED") {
       error.message = "Tempo de requisição excedido.";
     } else if (request && !response) {
       error.message = "Falha de conexão com o servidor.";
     }
 
+    // Erros de resposta HTTP
     if (response) {
       const resData = response.data;
       const defaultMessage = `Erro ${response.status}`;
@@ -64,23 +71,29 @@ api.interceptors.response.use(
 
       switch (response.status) {
         case 401:
-          if (typeof window !== "undefined") {
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.href = "/auth/login";
-          }
-          break;
         case 403:
+          // Limpa apenas o token e email, sem apagar todo storage
           if (typeof window !== "undefined") {
-            localStorage.clear();
-            sessionStorage.clear();
+            localStorage.removeItem("token");
+            sessionStorage.removeItem("token");
+            localStorage.removeItem("userEmail");
+            sessionStorage.removeItem("userEmail");
+
             window.location.href = "/auth/login";
           }
           break;
+
         case 500:
           error.message = "Erro interno no servidor.";
           break;
+
+        default:
+          break;
       }
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.error(`[API Error] ${error.message}`, error);
     }
 
     return Promise.reject(error);

@@ -1,15 +1,27 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactNode, useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
-export function ReactQueryProvider({ children }: { children: ReactNode }) {
-  // Criamos o QueryClient uma vez só
-  const [client] = useState(() => new QueryClient());
+export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const { isAuthenticated, hasAccount, loading } = useAuth();
 
-  return (
-    <QueryClientProvider client={client}>
-      {children}
-    </QueryClientProvider>
-  );
+  useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated) router.push("/auth/login");
+      else if (hasAccount === false) router.push("/auth/register/plan");
+    }
+  }, [isAuthenticated, hasAccount, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-600">
+        Verificando conta...
+      </div>
+    );
+  }
+
+  return <>{children}</>;
 }
