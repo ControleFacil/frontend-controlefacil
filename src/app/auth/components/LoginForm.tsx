@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { loginDashboard } from "@/http/api/auth/authService";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const LoginForm: React.FC = () => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -20,8 +22,8 @@ const LoginForm: React.FC = () => {
     setError(null);
 
     try {
-      const token = await loginDashboard(email, password, remember);
-      login(token, email, remember);
+      const data = await loginDashboard(email, password, remember);
+      login(data.token, email, remember);
     } catch (err: any) {
       console.error("Erro ao logar:", err);
       setError("E-mail ou senha inválidos. Tente novamente.");
@@ -90,8 +92,8 @@ const LoginForm: React.FC = () => {
                  </button> 
               <button className="px-2 py-2 rounded-lg flex items-center text-sm hover:bg-gray-50 transition"> 
                   <Image src="/assets/facebook.png" alt="Facebook" width={25} height={25} /> </button> 
-                  </div> <p className="text-xs text-center text-gray-500 mt-6"> Ainda não tem uma conta?{" "} 
-                    <span className="text-purple-600 cursor-pointer font-medium"> Crie agora </span> 
+                  </div> <p className="text-xs text-center text-gray-500 mt-6"> Ainda não tem uma conta?{""} 
+                    <span className="text-purple-600 cursor-pointer font-medium" onClick={() => router.push("/auth/register")}> Crie agora </span> 
                     </p> 
                     <div className="flex justify-between text-xs text-gray-400 mt-6"> 
                       <span>Termos e condições</span> 

@@ -19,5 +19,5 @@ const response = await api.post("/login", { email, senha });
   storage.setItem("token", token);
   storage.setItem("userData", JSON.stringify(response.data));
 
-  return response.data.token;
+  return response.data;
 };

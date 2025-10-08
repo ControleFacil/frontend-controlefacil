@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<{ email: string } | null>(null);
-  const [loading, setLoading] = useState(true); // 👈 novo
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {

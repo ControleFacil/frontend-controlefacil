@@ -54,10 +54,8 @@ export default function CartoesSection() {
 
   return (
     <div className="space-y-6">
-      {/* Cartão principal */}
       <CartaoItem cartao={primeiro} destaque />
 
-      {/* Botão Ver todos */}
       <div className="flex justify-center">
         <button
           onClick={() => setMostrarDetalhes(!mostrarDetalhes)}
@@ -67,7 +65,6 @@ export default function CartoesSection() {
         </button>
       </div>
 
-      {/* Lista de cartões */}
       {mostrarDetalhes && (
         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {cartoes.map((cartao) => (
