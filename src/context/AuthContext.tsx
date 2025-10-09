@@ -44,13 +44,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const data = await getAccountStatus(token);
           setHasAccount(data.hasAccount);
 
-          if (!data.hasAccount) {
-            router.push("/auth/register");
-          } else if (!data.contaAtiva) {
+         if (!data.hasAccount) {
+            router.push("/auth/register/account");
+          } else if (data.contaAtiva === false) {
             router.push("/auth/register/plan");
           } else {
             router.push("/dashboard");
           }
+
         } catch (err) {
           console.error("Erro ao verificar conta:", err);
           setHasAccount(false);
