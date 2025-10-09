@@ -51,17 +51,13 @@ export default function Header() {
             onClick={() => setOpen(true)}
             className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
           >
-            <Plus className="w-4 h-4" /> Adicionar
+            <Plus className="w-4 h-4" /> Adicionar Transação
           </button>
 
           <button className="relative p-2 rounded-full bg-gray-100 hover:bg-gray-200">
             <Bell className="w-5 h-5 text-gray-600" />
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"></span>
           </button>
-
-          <div className="w-9 h-9 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold">
-            <User className="w-5 h-5" />
-          </div>
         </div>
       </header>
 

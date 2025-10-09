@@ -40,7 +40,7 @@ const RegisterForm: React.FC = () => {
 
       sessionStorage.setItem("registeredUser", JSON.stringify(response.data));
 
-      router.push("register/plan");
+      router.push("register/account");
     } catch (err: any) {
       console.error("Erro ao criar conta:", err);
 

@@ -3,12 +3,16 @@ import api from "@/lib/axios";
 /**
  * Verifica se o usuário autenticado já possui uma conta vinculada
  */
-export async function checkUserAccount(token: string): Promise<boolean> {
+export async function getAccountStatus(token: string): Promise<{
+  hasAccount: boolean;
+  contaAtiva?: boolean;
+  conta?: any;
+}> {
   const response = await api.get("/api/conta/me", {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  return response.data?.hasAccount ?? false;
+  return response.data;
 }
 
 /**

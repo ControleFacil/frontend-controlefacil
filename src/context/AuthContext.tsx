@@ -8,7 +8,7 @@ import {
   useEffect,
 } from "react";
 import { useRouter } from "next/navigation";
-import { checkUserAccount } from "@/http/api/auth/accountService";
+import { getAccountStatus } from "@/http/api/auth/accountService";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<{ email: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasAccount, setHasAccount] = useState<boolean | null>(null);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -37,9 +38,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (token && userEmail) {
       setIsAuthenticated(true);
       setUser({ email: userEmail });
+
+      const verifyAccount = async () => {
+        try {
+          const data = await getAccountStatus(token);
+          setHasAccount(data.hasAccount);
+
+          if (!data.hasAccount) {
+            router.push("/auth/register");
+          } else if (!data.contaAtiva) {
+            router.push("/auth/register/plan");
+          } else {
+            router.push("/dashboard");
+          }
+        } catch (err) {
+          console.error("Erro ao verificar conta:", err);
+          setHasAccount(false);
+          router.push("/auth/login");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      verifyAccount();
+    } else {
+      setIsAuthenticated(false);
+      setUser(null);
+      setHasAccount(null);
+      setLoading(false);
     }
-    setLoading(false);
-  }, []);
+  }, [router]);
 
   const login = async (token: string, email: string, rememberMe: boolean) => {
     const storage = rememberMe ? localStorage : sessionStorage;
@@ -50,16 +78,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser({ email });
 
     try {
-      const hasAccount = await checkUserAccount(token);
+      const data = await getAccountStatus(token);
+      setHasAccount(data.hasAccount);
 
-      if (hasAccount) {
-        router.push("/dashboard");
-      } else {
+      if (!data.hasAccount) {
+        router.push("/auth/register");
+      } else if (!data.contaAtiva) {
         router.push("/auth/register/plan");
+      } else {
+        router.push("/dashboard");
       }
     } catch (err) {
       console.error("Erro ao verificar conta:", err);
-      router.push("/auth/login");
+      logout();
     }
   };
 
@@ -68,14 +99,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     sessionStorage.removeItem("token");
     localStorage.removeItem("userEmail");
     sessionStorage.removeItem("userEmail");
+
     setIsAuthenticated(false);
     setUser(null);
+    setHasAccount(null);
+
     router.push("/auth/login");
   };
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, login, logout, loading }}
+      value={{ isAuthenticated, user, login, logout, loading, hasAccount }}
     >
       {children}
     </AuthContext.Provider>

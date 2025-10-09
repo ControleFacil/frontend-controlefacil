@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/axios";
+import api from "@/lib/axios";
 import { Check } from "lucide-react";
 
 export default function PlanPage() {
@@ -12,7 +12,10 @@ export default function PlanPage() {
   const router = useRouter();
 
   useEffect(() => {
-    api.get("/api/plano").then((r) => setPlanos(r.data));
+    api
+      .get("/api/plano")
+      .then((r) => setPlanos(r.data))
+      .catch((err) => console.error("Erro ao buscar planos:", err));
   }, []);
 
   const handleNext = async () => {
@@ -22,11 +25,21 @@ export default function PlanPage() {
     }
 
     setLoading(true);
+
     try {
-      await api.post("api/conta", { nome: "Minha conta" });
-      router.push(`/register/payment/${selected}`);
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      if (!token) {
+        alert("Sessão expirada. Faça login novamente.");
+        router.push("/auth/login");
+        return;
+      }
+
+      router.push(`/auth/register/payment/${selected}`);
     } catch (error) {
-      alert("Erro ao criar conta. Tente novamente.");
+      console.error("Erro ao processar plano:", error);
+      alert("Erro ao processar plano. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -38,7 +51,7 @@ export default function PlanPage() {
         <h1 className="text-3xl font-bold text-purple-700 flex items-center gap-2">
           💜 Controle Fácil
         </h1>
-        <p className="text-sm text-gray-600 mt-1">Passo 1 de 3</p>
+        <p className="text-sm text-gray-600 mt-1">Passo 2 de 3</p>
         <h2 className="text-2xl font-semibold mt-4 text-gray-800">
           Escolha o melhor plano para você
         </h2>
@@ -62,7 +75,8 @@ export default function PlanPage() {
                   : "bg-gradient-to-r from-purple-300 to-purple-400"
               }`}
             >
-              {plano.nome.charAt(0).toUpperCase() + plano.nome.slice(1).toLowerCase()}
+              {plano.nome.charAt(0).toUpperCase() +
+                plano.nome.slice(1).toLowerCase()}
             </div>
 
             <ul className="text-gray-600 space-y-2 text-sm">
