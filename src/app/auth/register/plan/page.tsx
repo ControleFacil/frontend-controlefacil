@@ -81,7 +81,7 @@ export default function PlanPage() {
 
             <ul className="text-gray-600 space-y-2 text-sm">
               <li>💰 R$ {plano.precoMensal.toFixed(2)}/mês</li>
-              <li>🏦 Até {plano.limiteContas} contas</li>
+              <li>🗒️ Acesso Bot Whatsapp</li>
               <li>🔁 {plano.limiteTransacoes} transações/mês</li>
               <li>
                 {plano.suportePrioritario

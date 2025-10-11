@@ -38,9 +38,12 @@ const RegisterForm: React.FC = () => {
 
       console.log("Usuário criado:", response.data);
 
+      // 🔹 Salva temporariamente para referência futura (opcional)
       sessionStorage.setItem("registeredUser", JSON.stringify(response.data));
 
-      router.push("register/account");
+      // 🔹 Mostra mensagem e redireciona para login
+      alert("Conta criada com sucesso! Faça login para continuar.");
+      router.push("/auth/login");
     } catch (err: any) {
       console.error("Erro ao criar conta:", err);
 
@@ -57,7 +60,7 @@ const RegisterForm: React.FC = () => {
 
   return (
     <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-[-8px_8px_12px_rgba(168,85,247,0.7)] font-['Noto_Sans']">
-      <h2 className="text-2xl font-semibold mb-1 text-gray-800">Crie sua conta</h2>
+      <h2 className="text-2xl font-semibold mb-1 text-gray-800">Crie seu Usuario</h2>
       <p className="text-black mb-6 font-medium">
         É um prazer ter <span className="text-purple-600 font-semibold">você</span> com a gente!
       </p>

@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setHasAccount(data.hasAccount);
 
       if (!data.hasAccount) {
-        router.push("/auth/register");
+        router.push("/auth/register/account");
       } else if (!data.contaAtiva) {
         router.push("/auth/register/plan");
       } else {
