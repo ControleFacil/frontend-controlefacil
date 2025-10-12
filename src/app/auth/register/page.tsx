@@ -16,7 +16,6 @@ const SignUp = () => {
       <div className="flex flex-col justify-center items-center w-full lg:w-1/2 p-6 relative z-10">
         <RegisterForm />
       </div>
-
       {/* Área da imagem */}
       <div className="hidden lg:flex w-1/2 items-center justify-center relative z-10">
         <Image
