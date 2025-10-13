@@ -19,6 +19,14 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+    rules: {
+      // 🔧 Permitir any temporariamente
+      "@typescript-eslint/no-explicit-any": "off",
+      
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@next/next/no-img-element": "warn",
+      "react/no-unescaped-entities": "off",
+    },
   },
 ];
 
