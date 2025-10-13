@@ -14,7 +14,7 @@ export default function PagamentoErro() {
       <div className="flex flex-col justify-center items-center w-full p-6 relative z-10">
         <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-[-8px_8px_12px_rgba(239,68,68,0.5)] text-center font-['Noto_Sans']">
           <Image
-            src="/assets/error.svg"
+            src="/assets/cfLogo.png"
             alt="Pagamento Falhou"
             width={150}
             height={150}

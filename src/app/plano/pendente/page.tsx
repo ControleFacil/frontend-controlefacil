@@ -16,7 +16,7 @@ export default function PagamentoPendente() {
       <div className="flex flex-col justify-center items-center w-full p-6 relative z-10">
         <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-[-8px_8px_12px_rgba(234,179,8,0.5)] text-center font-['Noto_Sans']">
           <Image
-            src="/assets/pending.svg"
+            src="/assets/cfLogo.png"
             alt="Pagamento Pendente"
             width={150}
             height={150}
