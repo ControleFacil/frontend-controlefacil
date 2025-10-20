@@ -24,6 +24,7 @@ export interface TransacaoResponse {
   descricao: string;
   valor: number;
   categoriaNome: string;
+  tipo: "ENTRADA" | "SAIDA";
   hora: string;
 }
 
