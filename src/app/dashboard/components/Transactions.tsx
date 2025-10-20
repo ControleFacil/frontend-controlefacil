@@ -70,7 +70,7 @@ export default function Transactions() {
   };
 
   const handleEdit = async (t: TransacaoResponse) => {
-    setShowModal(false); // fecha "Ver tudo"
+    setShowModal(false);
     setEditing(t);
 
     try {
@@ -83,11 +83,10 @@ export default function Transactions() {
     setForm({
       descricao: t.descricao,
       valor: t.valor,
-      tipo: t.valor < 0 ? "SAIDA" : "ENTRADA",
+      tipo: t.tipo,
       categoriaNome: t.categoriaNome || "",
     });
   };
-
 
   const handleUpdate = async () => {
     if (!editing) return;
@@ -266,10 +265,12 @@ export default function Transactions() {
                   <div className="flex items-center gap-3">
                     <p
                       className={`font-semibold ${
-                        t.valor < 0 ? "text-red-500" : "text-green-600"
+                        t.tipo === "SAIDA" ? "text-red-500" : "text-green-600"
                       }`}
                     >
-                      {t.valor < 0 ? `-R$${Math.abs(t.valor)}` : `+R$${t.valor}`}
+                      {t.tipo === "SAIDA"
+                        ? `-R$${Math.abs(t.valor)}`
+                        : `+R$${Math.abs(t.valor)}`}
                     </p>
                     <Notebook
                       className="w-5 h-5 text-blue-500 cursor-pointer hover:text-blue-700"
