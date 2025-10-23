@@ -129,7 +129,7 @@ export default function FutureExpenses() {
       <AnimatePresence>
         {openForm && (
           <GastoFormModal
-            editing={editing}
+            editing={editing || undefined}
             onClose={() => setOpenForm(false)}
             onSave={fetchGastos}
             createGastoFuturo={createGastoFuturo}
