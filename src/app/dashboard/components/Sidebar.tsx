@@ -22,7 +22,7 @@ export default function Sidebar() {
       <div>
         <div className="flex items-center gap-2 p-6">
           <div className="text-white w-10 h-10 flex items-center justify-center rounded-full font-bold">
-            <img src="/assets/cflogo.png" alt="Logo" />
+            <img src="/assets/cfLogo.png" alt="Logo" />
           </div>
           <span className="font-semibold text-lg text-gray-800">Controle Fácil</span>
         </div>
