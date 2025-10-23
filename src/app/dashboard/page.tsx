@@ -3,9 +3,9 @@ import Header from "./components/Header";
 import Goals from "./components/Goals/Goals";
 import FinancialHealth from "./components/FinancialHealth";
 import CardInfo from "./components/CardInfo";
-import Transactions from "./components/Transactions";
+import Transactions from "./components/Transactions/Transactions";
 import MonthlyView from "./components/MonthlyView";
-import FutureExpenses from "./components/FutureExpenses";
+import FutureExpenses from "./components/Future-Expenses/FutureExpenses";
 
 export default function DashboardPage() {
   return (
