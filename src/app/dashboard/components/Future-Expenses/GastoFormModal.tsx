@@ -6,13 +6,14 @@ import Image from 'next/image';
 import { motion, Variants } from 'framer-motion';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { GastoFuturoResponse } from '@/http/api/dashboard/dashboardService';
 
 interface GastoFormModalProps {
-  editing?: { id: string; descricao: string; valor: number; data: string };
+  editing?: { id: string; descricao: string; valor: number; data: string } | null;
   onClose: () => void;
   onSave: () => void;
   createGastoFuturo: (body: { descricao: string; valor: number; data: string }) => Promise<void>;
-  updateGastoFuturo: (id: string, body: { descricao: string; valor: number; data: string }) => Promise<void>;
+  updateGastoFuturo: (id: string, body: { descricao: string; valor: number; data: string }) => Promise<GastoFuturoResponse>;
 }
 
 const fadeUp: Variants = {
@@ -163,7 +164,7 @@ export default function GastoFormModal({
           <motion.div className="relative" custom={3} variants={fadeUp}>
             <DatePicker
               selected={data}
-              onChange={(d: Date) => setData(d)}
+              onChange={(d: Date | null) => d && setData(d)}
               className={`peer w-full border-2 rounded-xl px-4 pt-6 pb-2 text-base outline-none transition-all ${
                 errors.data ? 'border-red-500 bg-red-50' : 'border-gray-200 focus:border-purple-500'
               }`}
