@@ -1,6 +1,6 @@
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
-import Goals from "./components/Goals";
+import Goals from "./components/Goals/Goals";
 import FinancialHealth from "./components/FinancialHealth";
 import CardInfo from "./components/CardInfo";
 import Transactions from "./components/Transactions";
@@ -11,6 +11,7 @@ export default function DashboardPage() {
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
+
       <main className="flex-1 p-6 overflow-y-auto">
         <Header />
         <section
