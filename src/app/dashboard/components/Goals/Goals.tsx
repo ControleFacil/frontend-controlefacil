@@ -229,7 +229,7 @@ export default function Goals() {
           <GoalCard
             key={goal.id}
             goal={goal}
-            customAmount={customAmounts[goal.id] || 0}
+            customAmount={String(customAmounts[goal.id] || '')}
             onAdd={addToGoal}
             onCustomChange={handleCustomChange}
             onEdit={handleEdit}
