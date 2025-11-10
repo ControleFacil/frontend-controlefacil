@@ -120,7 +120,7 @@ export default function LandingPage() {
                 className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-1 transition-all"
                 transition={{ duration: 0.18 }}
               >
-                Criar Conta Grátis
+                Criar Conta
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -182,7 +182,7 @@ export default function LandingPage() {
             onClick={() => router.push("/auth/register")}
             className="mt-8 bg-yellow-400 text-gray-900 px-6 py-3 rounded-full font-semibold shadow-lg"
           >
-            Quero sair desse ciclo — começar grátis
+            Quero sair desse ciclo — começar agora
           </motion.button>
         </div>
       </motion.section>
@@ -219,7 +219,7 @@ export default function LandingPage() {
                 <p className="text-gray-600 mt-2 flex-1">{f.text}</p>
 
                 <button onClick={() => router.push("/auth/register")} className="mt-4 w-full bg-purple-600 text-white py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors">
-                  Testar grátis
+                  Testar
                 </button>
               </motion.article>
             ))}
@@ -264,7 +264,7 @@ export default function LandingPage() {
 
                 <div className="mt-6">
                   <button onClick={() => router.push("/auth/register")} className="inline-flex items-center gap-2 bg-purple-600 text-white px-5 py-3 rounded-lg font-semibold shadow">
-                    Começar grátis
+                    Começar agora
                   </button>
                 </div>
               </motion.div>
@@ -292,7 +292,7 @@ export default function LandingPage() {
             variants={fadeUp}
             className="mt-3 text-gray-600 max-w-2xl mx-auto"
           >
-            Comece grátis e evolua conforme suas necessidades. Todos os planos
+            Comece agora e evolua conforme suas necessidades. Todos os planos
             incluem segurança, backups automáticos e suporte via chat.
           </motion.p>
 
@@ -474,7 +474,7 @@ export default function LandingPage() {
       >
         <div className="max-w-4xl mx-auto px-6">
           <h3 className="text-3xl font-bold">Pronto para transformar suas finanças?</h3>
-          <p className="mt-3 text-white/90">Comece grátis e experimente o plano Premium por 7 dias.</p>
+          <p className="mt-3 text-white/90">Comece agora e experimente o plano Premium por 7 dias.</p>
           <div className="mt-6 flex items-center justify-center gap-4">
             <button onClick={() => router.push("/auth/register")} className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold">Criar Conta</button>
             <button onClick={() => router.push("/checkout/premium")} className="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold">Assinar Premium</button>
