@@ -6,6 +6,7 @@ import CardInfo from "./components/CardInfo";
 import Transactions from "./components/Transactions/Transactions";
 import MonthlyView from "./components/MonthlyView";
 import FutureExpenses from "./components/Future-Expenses/FutureExpenses";
+import GastosExpenses from "./components/GastosExpenses";
 
 export default function DashboardPage() {
   return (
@@ -26,6 +27,7 @@ export default function DashboardPage() {
             <Goals />
             <FinancialHealth />
             <MonthlyView />
+            <GastosExpenses />
           </div>
           <div className="space-y-10 md:col-span-2 lg:col-span-1">
             <CardInfo />

@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-
+import { CategoriaGastoResponse } from "@/app/dashboard/components/GastosExpenses";
 export interface MetaResponse {
   id: string;
   titulo: string;
@@ -70,6 +70,15 @@ export const getMetas = async (): Promise<MetaResponse[]> => {
   }
 };
 
+export const getGastosPorCategoria = async (): Promise<CategoriaGastoResponse[]> => {
+  try {
+    const response = await api.get("/api/transacao/visao-categorias");
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar gastos por categoria:", error);
+    throw new Error("Não foi possível carregar os gastos por categoria");
+  }
+};
 export const getSaudeFinanceira = async (): Promise<SaudeFinanceiraResponse> => {
   try {
     const response = await api.get('/api/saude-financeira');
