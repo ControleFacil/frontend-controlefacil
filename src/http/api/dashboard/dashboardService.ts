@@ -60,6 +60,21 @@ export interface CartaoRequest {
   bandeira: string;
 }
 
+export interface EntradasPorDiaResponse {
+  diaSemana: string;
+  total: number;
+}
+
+export const getEntradasPorDiaSemana = async (): Promise<EntradasPorDiaResponse[]> => {
+  try {
+    const response = await api.get("/api/transacao/entradas-por-dia-semana");
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar entradas por dia da semana:", error);
+    throw new Error("Não foi possível carregar os dados das entradas por dia da semana");
+  }
+};
+
 export const getMetas = async (): Promise<MetaResponse[]> => {
   try {
     const response = await api.get('/api/metas');

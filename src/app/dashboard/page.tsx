@@ -7,6 +7,7 @@ import Transactions from "./components/Transactions/Transactions";
 import MonthlyView from "./components/MonthlyView";
 import FutureExpenses from "./components/Future-Expenses/FutureExpenses";
 import GastosExpenses from "./components/GastosExpenses";
+import EntradasPorDiaSemanaChart from "./components/EntradasPorDiaSemanaChart";
 
 export default function DashboardPage() {
   return (
@@ -33,6 +34,7 @@ export default function DashboardPage() {
             <CardInfo />
             <Transactions />
             <FutureExpenses />
+            <EntradasPorDiaSemanaChart />
           </div>
         </section>
       </main>
