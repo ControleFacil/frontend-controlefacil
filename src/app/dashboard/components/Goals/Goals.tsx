@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Target, TrendingUp } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import {
   getMetas,
@@ -37,37 +37,26 @@ export default function Goals() {
   const [editing, setEditing] = useState<Goal | null>(null);
   const [creating, setCreating] = useState(false);
 
-  const [createForm, setCreateForm] = useState<{
-    descricao: string;
-    valorObjetivo: number | null;
-    dataLimite: string;
-  }>({
+  const [createForm, setCreateForm] = useState({
     descricao: "",
-    valorObjetivo: null,
+    valorObjetivo: null as number | null,
     dataLimite: "",
   });
-  const [editForm, setEditForm] = useState<{
-    descricao: string;
-    valorObjetivo: number | null;
-    valorAtual: number | null;
-    dataLimite: string;
-  }>({
+
+  const [editForm, setEditForm] = useState({
     descricao: '',
-    valorObjetivo: null,
-    valorAtual: null,
+    valorObjetivo: null as number | null,
+    valorAtual: null as number | null,
     dataLimite: '',
   });
+
   useEffect(() => {
     const fetchMetas = async () => {
       try {
         setLoading(true);
         const metasData = await getMetas();
         const colors: ('green' | 'blue' | 'purple' | 'red' | 'yellow')[] = [
-          'green',
-          'blue',
-          'purple',
-          'red',
-          'yellow',
+          'green', 'blue', 'purple', 'red', 'yellow',
         ];
         const mappedGoals: Goal[] = metasData.map((meta: MetaResponse, index) => ({
           id: meta.id,
@@ -87,6 +76,10 @@ export default function Goals() {
     fetchMetas();
   }, []);
 
+  const totalTarget = goals.reduce((sum, g) => sum + g.targetAmount, 0);
+  const totalCurrent = goals.reduce((sum, g) => sum + g.currentAmount, 0);
+  const progress = totalTarget ? Math.round((totalCurrent / totalTarget) * 100) : 0;
+
   const addToGoal = async (id: string, amount: number) => {
     const goal = goals.find((g) => g.id === id);
     if (!goal) return;
@@ -105,14 +98,8 @@ export default function Goals() {
   const handleCreate = async () => {
     const { descricao, valorObjetivo, dataLimite } = createForm;
 
-    if (
-      !descricao.trim() ||
-      !dataLimite.trim() ||
-      valorObjetivo === null ||
-      valorObjetivo <= 0
-    ) {
+    if (!descricao.trim() || !dataLimite.trim() || !valorObjetivo || valorObjetivo <= 0)
       return alert('Preencha todos os campos corretamente');
-    }
 
     try {
       const payload = {
@@ -133,7 +120,6 @@ export default function Goals() {
           dataLimite: created.dataLimite,
         },
       ]);
-
       setCreating(false);
       setCreateForm({ descricao: '', valorObjetivo: null, dataLimite: '' });
     } catch (err) {
@@ -183,7 +169,6 @@ export default function Goals() {
     }
   };
 
-
   const handleDelete = async (id: string) => {
     if (!confirm('Tem certeza?')) return;
     try {
@@ -205,21 +190,52 @@ export default function Goals() {
       animate="visible"
       variants={fadeUp}
       transition={{ duration: 0.4 }}
-      className="bg-white shadow-lg rounded-2xl p-8 space-y-6"
+      className="bg-white shadow-xl rounded-2xl p-8 space-y-8 border border-gray-100"
     >
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold text-gray-800">Metas</h2>
+      {/* HEADER */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-800">Metas Financeiras</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Acompanhe seu progresso e gerencie seus objetivos financeiros de forma inteligente.
+          </p>
+        </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => setCreating(true)}
-          className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all"
+          className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all shadow-md"
         >
           <Plus size={18} />
-          Adicionar Meta
+          Nova Meta
         </motion.button>
       </div>
 
+      {/* STATS OVERVIEW */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+        <div className="p-4 rounded-xl bg-purple-50 border border-purple-100">
+          <div className="flex items-center gap-2 text-purple-700 font-medium">
+            <Target size={18} /> Total de Metas
+          </div>
+          <p className="text-2xl font-semibold text-purple-900 mt-1">{goals.length}</p>
+        </div>
+        <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+          <div className="flex items-center gap-2 text-blue-700 font-medium">
+            <TrendingUp size={18} /> Progresso Total
+          </div>
+          <p className="text-2xl font-semibold text-blue-900 mt-1">{progress}%</p>
+        </div>
+        <div className="p-4 rounded-xl bg-green-50 border border-green-100">
+          <div className="flex items-center gap-2 text-green-700 font-medium">
+            <TrendingUp size={18} /> Valor Acumulado
+          </div>
+          <p className="text-2xl font-semibold text-green-900 mt-1">
+            R$ {totalCurrent.toLocaleString('pt-BR')}
+          </p>
+        </div>
+      </div>
+
+      {/* GRID DE METAS */}
       <motion.div
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         variants={fadeUp}

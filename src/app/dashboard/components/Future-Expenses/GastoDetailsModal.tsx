@@ -37,13 +37,15 @@ export default function FutureExpensesDetails({
   onDelete,
 }: FutureExpensesDetailsProps) {
   // Preparar dados para gráfico
-  const chartData = gastos
-    .map(g => ({
-      name: g.descricao,
-      valor: g.valor,
-      data: new Date(g.data).toLocaleDateString('pt-BR'),
-    }))
-    .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
+  const chartData = Array.isArray(gastos)
+    ? gastos
+        .map((g) => ({
+          name: g.descricao || "Sem descrição",
+          valor: g.valor ?? 0,
+          data: g.data ? new Date(g.data).toLocaleDateString("pt-BR") : "Data não informada",
+        }))
+        .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
+    : [];
 
   return (
     <motion.div

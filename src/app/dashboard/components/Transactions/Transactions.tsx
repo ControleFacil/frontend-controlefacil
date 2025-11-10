@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { X, CreditCard, Trash2, Notebook } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
+import { X, CreditCard, Trash2, Notebook, Filter } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import {
   getTransacoes,
-  TransacaoResponse,
   deleteTransacao,
   getCategorias,
+  TransacaoResponse,
 } from '@/http/api/dashboard/dashboardService';
-import TransactionFormEdit from './TransactionForm'; // importar o formulário de edição
+import TransactionFormEdit from './TransactionForm';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -23,38 +23,34 @@ const fadeUp: Variants = {
 export default function Transactions() {
   const [transacoes, setTransacoes] = useState<TransacaoResponse[]>([]);
   const [allTransacoes, setAllTransacoes] = useState<TransacaoResponse[]>([]);
+  const [categorias, setCategorias] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadingAll, setLoadingAll] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<TransacaoResponse | null>(null);
 
+  // filtros
+  const [filtroTipo, setFiltroTipo] = useState<string>('TODOS');
+  const [filtroCategoria, setFiltroCategoria] = useState<string>('TODAS');
+  const [ordemAlfabetica, setOrdemAlfabetica] = useState<'ASC' | 'DESC'>('ASC');
+
   useEffect(() => {
     fetchData();
+    getCategorias()
+      .then(setCategorias)
+      .catch(() => console.error('Erro ao carregar categorias'));
   }, []);
 
   const fetchData = async () => {
     try {
-      const data = await getTransacoes(5);
+      const data = await getTransacoes(100);
       setTransacoes(data);
+      setAllTransacoes(data);
     } catch {
       setError('Erro ao carregar transações');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const openModal = async () => {
-    setShowModal(true);
-    setLoadingAll(true);
-    try {
-      const data = await getTransacoes(100);
-      setAllTransacoes(data);
-    } catch {
-      setError('Erro ao carregar todas as transações');
-    } finally {
-      setLoadingAll(false);
     }
   };
 
@@ -69,9 +65,30 @@ export default function Transactions() {
     }
   };
 
-  const handleEdit = (t: TransacaoResponse) => {
-    setEditing(t);
-  };
+  const handleEdit = (t: TransacaoResponse) => setEditing(t);
+
+  // 🔎 Aplicar filtros e ordenação no front
+  const transacoesFiltradas = useMemo(() => {
+    let filtradas = [...allTransacoes];
+
+    if (filtroTipo !== 'TODOS') {
+      filtradas = filtradas.filter(t => t.tipo === filtroTipo);
+    }
+
+    if (filtroCategoria !== 'TODAS') {
+      filtradas = filtradas.filter(t => t.categoriaNome === filtroCategoria);
+    }
+
+    filtradas.sort((a, b) => {
+      const descA = a.descricao.toLowerCase();
+      const descB = b.descricao.toLowerCase();
+      return ordemAlfabetica === 'ASC'
+        ? descA.localeCompare(descB)
+        : descB.localeCompare(descA);
+    });
+
+    return filtradas;
+  }, [allTransacoes, filtroTipo, filtroCategoria, ordemAlfabetica]);
 
   const TransactionCard = ({ t, index }: { t: TransacaoResponse; index: number }) => (
     <motion.div
@@ -83,8 +100,8 @@ export default function Transactions() {
       className="flex justify-between items-start border-b py-4 hover:bg-gray-50 transition rounded-lg px-3"
     >
       <div className="flex items-start gap-4">
-        <div className="bg-purple-100 p-2 rounded-lg">
-          <CreditCard className="w-6 h-6 text-purple-600" />
+        <div className={`p-2 rounded-lg ${t.tipo === 'SAIDA' ? 'bg-red-100' : 'bg-green-100'}`}>
+          <CreditCard className={`w-6 h-6 ${t.tipo === 'SAIDA' ? 'text-red-600' : 'text-green-600'}`} />
         </div>
         <div>
           <p className="font-semibold text-gray-800">{t.descricao}</p>
@@ -115,45 +132,65 @@ export default function Transactions() {
   );
 
   return (
-    <>
-      <div className="bg-white p-6 rounded-xl shadow h-72 overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Histórico de Transações</h2>
-          <button
-            onClick={openModal}
-            className="flex items-center gap-2 text-purple-600 font-medium"
-          >
-            Ver tudo
-          </button>
-        </div>
+    <div className="bg-white rounded-2xl shadow-md p-6">
+      {/* Cabeçalho e filtros */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <Filter className="w-6 h-6 text-purple-600" />
+          Transações
+        </h2>
 
-        {loading && <p className="text-gray-500 text-sm">Carregando...</p>}
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        {!loading && !error && transacoes.length === 0 && (
-          <p className="text-gray-500 text-sm">Nenhuma transação encontrada</p>
-        )}
-        {!loading && !error && transacoes.map((t, i) => <TransactionCard key={t.id} t={t} index={i} />)}
+        <div className="flex flex-wrap gap-3">
+          {/* Tipo */}
+          <select
+            value={filtroTipo}
+            onChange={e => setFiltroTipo(e.target.value)}
+            className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="TODOS">Todos os tipos</option>
+            <option value="SAIDA">Saídas</option>
+            <option value="ENTRADA">Entradas</option>
+          </select>
+
+          {/* Categoria */}
+          <select
+            value={filtroCategoria}
+            onChange={e => setFiltroCategoria(e.target.value)}
+            className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="TODAS">Todas as categorias</option>
+            {categorias.map(cat => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+          {/* Ordem */}
+          <select
+            value={ordemAlfabetica}
+            onChange={e => setOrdemAlfabetica(e.target.value as 'ASC' | 'DESC')}
+            className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="ASC">A → Z</option>
+            <option value="DESC">Z → A</option>
+          </select>
+        </div>
       </div>
 
-      {/* Modal Ver Tudo */}
-      {showModal && (
-        <motion.div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <motion.div className="bg-white rounded-2xl shadow-xl w-3/4 max-h-[80vh] overflow-y-auto p-6 relative">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <X size={20} />
-            </button>
-            <h2 className="text-xl font-semibold mb-4">Todas as Transações</h2>
-            {loadingAll && <p className="text-gray-500 text-sm">Carregando...</p>}
-            {!loadingAll &&
-              allTransacoes.map((t, i) => <TransactionCard key={t.id} t={t} index={i} />)}
-          </motion.div>
-        </motion.div>
+      {/* Lista */}
+      {loading && <p className="text-gray-500 text-sm">Carregando...</p>}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {!loading && !error && transacoesFiltradas.length === 0 && (
+        <p className="text-gray-500 text-sm">Nenhuma transação encontrada</p>
       )}
 
-      {/* Modal Editar */}
+      <div className="divide-y divide-gray-100 max-h-[70vh] overflow-y-auto">
+        {transacoesFiltradas.map((t, i) => (
+          <TransactionCard key={t.id} t={t} index={i} />
+        ))}
+      </div>
+
       {editing && (
         <TransactionFormEdit
           editing={editing}
@@ -162,6 +199,6 @@ export default function Transactions() {
           setAllTransacoes={setAllTransacoes}
         />
       )}
-    </>
+    </div>
   );
 }

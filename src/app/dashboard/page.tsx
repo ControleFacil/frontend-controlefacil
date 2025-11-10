@@ -11,7 +11,7 @@ import EntradasPorDiaSemanaChart from "./components/EntradasPorDiaSemanaChart";
 
 export default function DashboardPage() {
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 gap-4 p-4">
       <Sidebar />
 
       <main className="flex-1 p-6 overflow-y-auto">
@@ -25,15 +25,11 @@ export default function DashboardPage() {
           "
         >
           <div className="space-y-10 md:col-span-2">
-            <Goals />
             <FinancialHealth />
             <MonthlyView />
             <GastosExpenses />
           </div>
           <div className="space-y-10 md:col-span-2 lg:col-span-1">
-            <CardInfo />
-            <Transactions />
-            <FutureExpenses />
             <EntradasPorDiaSemanaChart />
           </div>
         </section>
