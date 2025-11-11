@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { X, CreditCard, Trash2, Notebook, Filter, Plus } from 'lucide-react';
+import { X, CreditCard, Trash2, Notebook, Filter, Plus, ArrowDownCircle, ArrowUpCircle, DollarSign, List } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import {
   getTransacoes,
@@ -10,7 +10,7 @@ import {
   TransacaoResponse,
 } from '@/http/api/dashboard/dashboardService';
 import TransactionFormEdit from './TransactionForm';
-import AddTransactionModal from './AddTransactionModal'; // novo modal
+import AddTransactionModal from './AddTransactionModal';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -31,7 +31,6 @@ export default function Transactions() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editing, setEditing] = useState<TransacaoResponse | null>(null);
 
-  // filtros
   const [filtroTipo, setFiltroTipo] = useState<string>('TODOS');
   const [filtroCategoria, setFiltroCategoria] = useState<string>('TODAS');
   const [ordemAlfabetica, setOrdemAlfabetica] = useState<'ASC' | 'DESC'>('ASC');
@@ -70,7 +69,6 @@ export default function Transactions() {
 
   const transacoesFiltradas = useMemo(() => {
     let filtradas = [...allTransacoes];
-
     if (filtroTipo !== 'TODOS') filtradas = filtradas.filter(t => t.tipo === filtroTipo);
     if (filtroCategoria !== 'TODAS') filtradas = filtradas.filter(t => t.categoriaNome === filtroCategoria);
 
@@ -84,6 +82,46 @@ export default function Transactions() {
 
     return filtradas;
   }, [allTransacoes, filtroTipo, filtroCategoria, ordemAlfabetica]);
+
+  const totalEntradas = useMemo(
+  () => transacoesFiltradas.filter(t => t.tipo === 'ENTRADA').reduce((acc, t) => acc + t.valor, 0),
+  [transacoesFiltradas]
+  );
+
+  const totalSaidas = useMemo(
+    () => transacoesFiltradas.filter(t => t.tipo === 'SAIDA').reduce((acc, t) => acc + t.valor, 0),
+    [transacoesFiltradas]
+  );
+
+  const saldo = useMemo(() => totalEntradas - totalSaidas, [totalEntradas, totalSaidas]);
+  const totalTransacoes = transacoesFiltradas.length;
+
+  const resumoCards = [
+    {
+      label: 'Entradas',
+      value: `R$ ${totalEntradas.toFixed(2)}`,
+      icon: <ArrowUpCircle className="w-6 h-6 text-green-600" />,
+      color: 'bg-green-50 border-green-200',
+    },
+    {
+      label: 'Saídas',
+      value: `R$ ${totalSaidas.toFixed(2)}`,
+      icon: <ArrowDownCircle className="w-6 h-6 text-red-600" />,
+      color: 'bg-red-50 border-red-200',
+    },
+    {
+      label: 'Saldo',
+      value: `R$ ${saldo.toFixed(2)}`,
+      icon: <DollarSign className="w-6 h-6 text-purple-600" />,
+      color: 'bg-purple-50 border-purple-200',
+    },
+    {
+      label: 'Transações',
+      value: totalTransacoes.toString(),
+      icon: <List className="w-6 h-6 text-blue-600" />,
+      color: 'bg-blue-50 border-blue-200',
+    },
+  ];
 
   const TransactionCard = ({ t, index }: { t: TransacaoResponse; index: number }) => (
     <motion.div
@@ -136,7 +174,6 @@ export default function Transactions() {
         </h2>
 
         <div className="flex flex-wrap gap-3 items-center">
-          {/* Botão adicionar transação */}
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all"
@@ -145,7 +182,6 @@ export default function Transactions() {
             Adicionar
           </button>
 
-          {/* Filtros */}
           <select
             value={filtroTipo}
             onChange={e => setFiltroTipo(e.target.value)}
@@ -178,6 +214,25 @@ export default function Transactions() {
             <option value="DESC">Z → A</option>
           </select>
         </div>
+      </div>
+
+      {/* --- NOVOS CARDS RESUMO --- */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {resumoCards.map((card, i) => (
+          <motion.div
+            key={card.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className={`p-5 rounded-2xl border ${card.color} flex items-center justify-between`}
+          >
+            <div>
+              <p className="text-sm text-gray-500">{card.label}</p>
+              <p className="text-xl font-bold text-gray-800">{card.value}</p>
+            </div>
+            {card.icon}
+          </motion.div>
+        ))}
       </div>
 
       {/* Lista */}
