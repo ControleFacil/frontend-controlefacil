@@ -216,26 +216,62 @@ export default function Transactions() {
         </div>
       </div>
 
-      {/* --- NOVOS CARDS RESUMO --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {resumoCards.map((card, i) => (
           <motion.div
             key={card.label}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className={`p-5 rounded-2xl border ${card.color} flex items-center justify-between`}
+            className={`relative p-6 rounded-2xl shadow-sm border ${card.color} overflow-hidden group hover:shadow-md transition-all`}
           >
-            <div>
-              <p className="text-sm text-gray-500">{card.label}</p>
-              <p className="text-xl font-bold text-gray-800">{card.value}</p>
+            {/* Ícone flutuante */}
+            <div className="absolute top-4 right-4 opacity-20 group-hover:opacity-30 transition">
+              {card.icon}
             </div>
-            {card.icon}
+
+            <div className="flex flex-col gap-1">
+              <p className="text-sm text-gray-500">{card.label}</p>
+              <p
+                className={`text-2xl font-bold ${
+                  card.label === 'Entradas'
+                    ? 'text-green-600'
+                    : card.label === 'Saídas'
+                    ? 'text-red-600'
+                    : card.label === 'Saldo'
+                    ? saldo > 0
+                      ? 'text-green-700'
+                      : 'text-red-700'
+                    : 'text-blue-600'
+                }`}
+              >
+                {card.label !== 'Transações'
+                  ? new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    }).format(Number(card.value.replace('R$', '').trim()))
+                  : card.value}
+              </p>
+            </div>
+
+            {/* Barra de destaque inferior */}
+            <div
+              className={`absolute bottom-0 left-0 h-1 w-full rounded-b-2xl ${
+                card.label === 'Entradas'
+                  ? 'bg-green-400'
+                  : card.label === 'Saídas'
+                  ? 'bg-red-400'
+                  : card.label === 'Saldo'
+                  ? saldo > 0
+                    ? 'bg-green-500'
+                    : 'bg-red-500'
+                  : 'bg-blue-400'
+              }`}
+            />
           </motion.div>
         ))}
       </div>
 
-      {/* Lista */}
       {loading && <p className="text-gray-500 text-sm">Carregando...</p>}
       {error && <p className="text-red-500 text-sm">{error}</p>}
       {!loading && !error && transacoesFiltradas.length === 0 && (
