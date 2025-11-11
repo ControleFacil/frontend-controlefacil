@@ -11,6 +11,7 @@ import {
   Moon,
   Menu,
   X,
+  MessageCircle,
 } from "lucide-react";
 
 const menuItems = [
@@ -23,9 +24,16 @@ const menuItems = [
 
 export default function Sidebar() {
   const [dark, setDark] = useState(false);
-  const [isOpen, setIsOpen] = useState(false); // Para menu mobile
+  const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  const openWhatsApp = () => {
+    const message = encodeURIComponent(
+      "Olá! Quero registrar uma nova transação no Controle Fácil 💰"
+    );
+    window.open(`https://wa.me/559984932799?text=${message}`, "_blank");
+  };
 
   return (
     <>
@@ -61,7 +69,6 @@ export default function Sidebar() {
             <span className="font-semibold text-lg text-gray-800">
               Controle Fácil
             </span>
-            {/* Botão fechar mobile */}
             <button
               className="md:hidden ml-auto"
               onClick={() => setIsOpen(false)}
@@ -78,7 +85,7 @@ export default function Sidebar() {
                   key={item.name}
                   onClick={() => {
                     router.push(item.href);
-                    setIsOpen(false); // fecha o menu ao navegar no mobile
+                    setIsOpen(false);
                   }}
                   className={`flex items-center gap-2 p-3 rounded-xl font-medium transition-all duration-300 ${
                     isActive
@@ -95,16 +102,25 @@ export default function Sidebar() {
         </div>
 
         <div className="p-4">
-          <div className="bg-purple-200 p-4 rounded-2xl text-sm text-purple-800 shadow-md">
-            <p className="font-medium">Análise orçamentária</p>
-            <p className="text-xs mb-2">
-              Uma IA treinada para ajudar você com suas finanças
+          {/* Seção do bot de registro de transações */}
+          <div className="bg-green-100 border border-green-300 p-4 rounded-2xl text-sm text-green-900 shadow-md">
+            <p className="font-semibold text-base mb-1 flex items-center gap-2">
+              <MessageCircle className="w-4 h-4 text-green-700" />
+              Bot de Registro Financeiro
             </p>
-            <button className="text-xs font-semibold underline">
-              Upgrade to Pro
+            <p className="text-xs mb-3 text-green-800">
+              Registre entradas e saídas de forma rápida pelo WhatsApp, sem precisar abrir o painel.
+            </p>
+            <button
+              onClick={openWhatsApp}
+              className="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Registrar via WhatsApp
             </button>
           </div>
 
+          {/* Tema */}
           <div className="flex gap-2 mt-4 bg-gray-100 p-1 rounded-xl">
             <button
               className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2 px-4 text-sm font-medium transition-colors ${
