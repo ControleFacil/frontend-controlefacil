@@ -36,7 +36,6 @@ export default function FutureExpensesDetails({
   onEdit,
   onDelete,
 }: FutureExpensesDetailsProps) {
-  // Preparar dados para gráfico
   const chartData = Array.isArray(gastos)
     ? gastos
         .map((g) => ({
@@ -60,7 +59,6 @@ export default function FutureExpensesDetails({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 120, damping: 15 }}
       >
-        {/* Logo e título */}
         <motion.div
           className="flex flex-col items-center mb-6"
           initial="hidden"
@@ -78,7 +76,6 @@ export default function FutureExpensesDetails({
           </p>
         </motion.div>
 
-        {/* Botão fechar */}
         <button
           onClick={onClose}
           className="absolute top-6 right-6 text-gray-500 hover:text-gray-700 transition"
@@ -86,7 +83,6 @@ export default function FutureExpensesDetails({
           <X size={24} />
         </button>
 
-        {/* Lista animada */}
         <motion.div
           className="space-y-3 mb-6"
           initial="hidden"
@@ -121,7 +117,6 @@ export default function FutureExpensesDetails({
           ))}
         </motion.div>
 
-        {/* Gráfico */}
         <motion.div
           className="bg-white rounded-xl p-4 shadow-md"
           initial={{ opacity: 0, y: 20 }}

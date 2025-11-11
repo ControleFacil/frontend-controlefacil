@@ -1,11 +1,8 @@
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
-import Goals from "./components/Goals/Goals";
 import FinancialHealth from "./components/FinancialHealth";
-import CardInfo from "./components/CardInfo";
-import Transactions from "./components/Transactions/Transactions";
+import FinancialSummary from "./components/FinancialSummary";
 import MonthlyView from "./components/MonthlyView";
-import FutureExpenses from "./components/Future-Expenses/FutureExpenses";
 import GastosExpenses from "./components/GastosExpenses";
 import EntradasPorDiaSemanaChart from "./components/EntradasPorDiaSemanaChart";
 
@@ -16,6 +13,9 @@ export default function DashboardPage() {
 
       <main className="flex-1 p-6 overflow-y-auto">
         <Header />
+        <div className="mt-8 mb-10">
+          <FinancialSummary />
+        </div>
         <section
           className="
             grid gap-7
