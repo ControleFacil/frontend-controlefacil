@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { X, CreditCard, Trash2, Notebook, Filter } from 'lucide-react';
+import { X, CreditCard, Trash2, Notebook, Filter, Plus } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import {
   getTransacoes,
@@ -10,6 +10,7 @@ import {
   TransacaoResponse,
 } from '@/http/api/dashboard/dashboardService';
 import TransactionFormEdit from './TransactionForm';
+import AddTransactionModal from './AddTransactionModal'; // novo modal
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -27,7 +28,7 @@ export default function Transactions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [editing, setEditing] = useState<TransacaoResponse | null>(null);
 
   // filtros
@@ -67,17 +68,11 @@ export default function Transactions() {
 
   const handleEdit = (t: TransacaoResponse) => setEditing(t);
 
-  // 🔎 Aplicar filtros e ordenação no front
   const transacoesFiltradas = useMemo(() => {
     let filtradas = [...allTransacoes];
 
-    if (filtroTipo !== 'TODOS') {
-      filtradas = filtradas.filter(t => t.tipo === filtroTipo);
-    }
-
-    if (filtroCategoria !== 'TODAS') {
-      filtradas = filtradas.filter(t => t.categoriaNome === filtroCategoria);
-    }
+    if (filtroTipo !== 'TODOS') filtradas = filtradas.filter(t => t.tipo === filtroTipo);
+    if (filtroCategoria !== 'TODAS') filtradas = filtradas.filter(t => t.categoriaNome === filtroCategoria);
 
     filtradas.sort((a, b) => {
       const descA = a.descricao.toLowerCase();
@@ -140,8 +135,17 @@ export default function Transactions() {
           Transações
         </h2>
 
-        <div className="flex flex-wrap gap-3">
-          {/* Tipo */}
+        <div className="flex flex-wrap gap-3 items-center">
+          {/* Botão adicionar transação */}
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all"
+          >
+            <Plus size={18} />
+            Adicionar
+          </button>
+
+          {/* Filtros */}
           <select
             value={filtroTipo}
             onChange={e => setFiltroTipo(e.target.value)}
@@ -152,7 +156,6 @@ export default function Transactions() {
             <option value="ENTRADA">Entradas</option>
           </select>
 
-          {/* Categoria */}
           <select
             value={filtroCategoria}
             onChange={e => setFiltroCategoria(e.target.value)}
@@ -166,7 +169,6 @@ export default function Transactions() {
             ))}
           </select>
 
-          {/* Ordem */}
           <select
             value={ordemAlfabetica}
             onChange={e => setOrdemAlfabetica(e.target.value as 'ASC' | 'DESC')}
@@ -191,6 +193,16 @@ export default function Transactions() {
         ))}
       </div>
 
+      {/* Modais */}
+      {showAddModal && (
+        <AddTransactionModal
+          setOpen={setShowAddModal}
+          onAdd={(t) => {
+            setTransacoes(prev => [t, ...prev]);
+            setAllTransacoes(prev => [t, ...prev]);
+          }}
+        />
+      )}
       {editing && (
         <TransactionFormEdit
           editing={editing}

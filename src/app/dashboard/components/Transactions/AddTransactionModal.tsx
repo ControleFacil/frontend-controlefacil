@@ -1,16 +1,17 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import Image from "next/image";
-import { createTransacao, getCategorias } from "@/http/api/dashboard/dashboardService";
+import { createTransacao, getCategorias, TransacaoResponse } from "@/http/api/dashboard/dashboardService";
 
 interface Props {
   setOpen: (value: boolean) => void;
+  onAdd: (t: TransacaoResponse) => void; // função que adiciona a transação ao histórico
 }
 
-export default function AddTransactionModal({ setOpen }: Props) {
+export default function AddTransactionModal({ setOpen, onAdd }: Props) {
   const [tipo, setTipo] = useState<"ENTRADA" | "SAIDA">("ENTRADA");
   const [valor, setValor] = useState<number | null>(null);
   const [descricao, setDescricao] = useState("");
@@ -37,9 +38,11 @@ export default function AddTransactionModal({ setOpen }: Props) {
     if (!validate()) return;
     setLoading(true);
     try {
-      await createTransacao({ valor: Number(valor), descricao, tipo, categoriaNome });
+      const novaTransacao = await createTransacao({ valor: Number(valor), descricao, tipo, categoriaNome });
+      onAdd(novaTransacao); // adiciona no estado do componente pai
       setOpen(false);
-      window.location.reload();
+    } catch (err) {
+      alert("Erro ao salvar transação");
     } finally {
       setLoading(false);
     }
