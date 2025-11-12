@@ -129,9 +129,19 @@ const LoginForm: React.FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
-        className="mt-3 text-sm text-purple-600 cursor-pointer hover:underline text-center"
+        className="mt-3 text-sm text-purple-600 text-center flex justify-center items-center gap-2"
       >
-        Esqueceu a senha? (em breve)
+        <span className="cursor-not-allowed opacity-80 hover:opacity-100 transition">
+          Esqueceu a senha?
+        </span>
+        <motion.span
+          initial={{ opacity: 0.5 }}
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="text-[10px] bg-purple-600 text-white px-2 py-[1px] rounded-full shadow-md"
+        >
+          Em breve
+        </motion.span>
       </motion.div>
 
       {/* Mensagem de erro animada */}
@@ -157,22 +167,47 @@ const LoginForm: React.FC = () => {
         <div className="flex-grow border-t border-black"></div>
       </div>
 
-      {/* Botões sociais */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="flex gap-9 justify-center"
+    {/* Botões sociais */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.5 }}
+      className="flex gap-6 justify-center"
+    >
+      {/* Google */}
+      <button
+        disabled
+        className="relative px-4 py-2 rounded-lg flex items-center gap-2 text-sm bg-gray-100 opacity-70 cursor-not-allowed shadow-sm"
       >
-        <button className="px-2 py-2 rounded-lg flex items-center text-sm hover:bg-gray-50 transition">
-          <Image src="/assets/googleIcon.png" alt="Google" width={25} height={25} />
-            <p>em breve</p>
-        </button>
-        <button className="px-2 py-2 rounded-lg flex items-center text-sm hover:bg-gray-50 transition">
-          <Image src="/assets/facebook.png" alt="Facebook" width={25} height={25} />
-           <p>em breve</p>
-        </button>
-      </motion.div>
+        <Image src="/assets/googleIcon.png" alt="Google" width={25} height={25} />
+        <span className="font-medium text-gray-600">Google</span>
+        <motion.span
+          initial={{ opacity: 0.5 }}
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="absolute -top-2 right-0 text-[10px] bg-purple-600 text-white px-2 py-[1px] rounded-full shadow-md"
+        >
+          Em breve
+        </motion.span>
+      </button>
+
+      {/* Facebook */}
+      <button
+        disabled
+        className="relative px-4 py-2 rounded-lg flex items-center gap-2 text-sm bg-gray-100 opacity-70 cursor-not-allowed shadow-sm"
+      >
+        <Image src="/assets/facebook.png" alt="Facebook" width={25} height={25} />
+        <span className="font-medium text-gray-600">Facebook</span>
+        <motion.span
+          initial={{ opacity: 0.5 }}
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="absolute -top-2 right-0 text-[10px] bg-purple-600 text-white px-2 py-[1px] rounded-full shadow-md"
+        >
+          Em breve
+        </motion.span>
+      </button>
+    </motion.div>
 
       {/* Criar conta */}
       <motion.p
