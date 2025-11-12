@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
@@ -16,13 +16,30 @@ const RegisterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [senhaValida, setSenhaValida] = useState(false);
+  const [formValido, setFormValido] = useState(false);
+
+  // Validação da senha
+  useEffect(() => {
+    const senhaRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    setSenhaValida(senhaRegex.test(senha));
+  }, [senha]);
+
+  // Validação do formulário completo
+  useEffect(() => {
+    const isValid =
+      nome.trim() !== "" &&
+      sobrenome.trim() !== "" &&
+      email.trim() !== "" &&
+      senhaValida &&
+      confirmarSenha === senha;
+    setFormValido(isValid);
+  }, [nome, sobrenome, email, senha, confirmarSenha, senhaValida]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (senha !== confirmarSenha) {
-      setError("As senhas não coincidem.");
-      return;
-    }
+    if (!formValido) return;
 
     setLoading(true);
     setError(null);
@@ -36,22 +53,15 @@ const RegisterForm: React.FC = () => {
         senha,
       });
 
-      console.log("Usuário criado:", response.data);
-
-      // 🔹 Salva temporariamente para referência futura (opcional)
       sessionStorage.setItem("registeredUser", JSON.stringify(response.data));
-
-      // 🔹 Mostra mensagem e redireciona para login
       alert("Conta criada com sucesso! Faça login para continuar.");
       router.push("/auth/login");
     } catch (err: any) {
       console.error("Erro ao criar conta:", err);
-
       const mensagem =
         err.response?.status === 409
           ? "E-mail já cadastrado. Tente outro."
           : err.response?.data || "Erro ao criar conta. Tente novamente.";
-
       setError(mensagem);
     } finally {
       setLoading(false);
@@ -60,7 +70,7 @@ const RegisterForm: React.FC = () => {
 
   return (
     <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-[-8px_8px_12px_rgba(168,85,247,0.7)] font-['Noto_Sans']">
-      <h2 className="text-2xl font-semibold mb-1 text-gray-800">Crie seu Usuario</h2>
+      <h2 className="text-2xl font-semibold mb-1 text-gray-800">Crie seu Usuário</h2>
       <p className="text-black mb-6 font-medium">
         É um prazer ter <span className="text-purple-600 font-semibold">você</span> com a gente!
       </p>
@@ -72,7 +82,6 @@ const RegisterForm: React.FC = () => {
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          required
         />
         <input
           type="text"
@@ -80,7 +89,6 @@ const RegisterForm: React.FC = () => {
           value={sobrenome}
           onChange={(e) => setSobrenome(e.target.value)}
           className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          required
         />
         <input
           type="email"
@@ -88,36 +96,55 @@ const RegisterForm: React.FC = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          required
         />
         <input
           type="password"
           placeholder="Senha"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
-          className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          required
+          className={`w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none ${
+            senha && !senhaValida ? "border-red-400" : "focus:ring-2 focus:ring-purple-500"
+          }`}
         />
+        {!senhaValida && senha && (
+          <p className="text-xs text-red-500">
+            Senha fraca: siga os requisitos abaixo.
+          </p>
+        )}
         <input
           type="password"
           placeholder="Confirmar senha"
           value={confirmarSenha}
           onChange={(e) => setConfirmarSenha(e.target.value)}
-          className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          required
+          className={`w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none ${
+            confirmarSenha && confirmarSenha !== senha
+              ? "border-red-400"
+              : "focus:ring-2 focus:ring-purple-500"
+          }`}
         />
+        {confirmarSenha && confirmarSenha !== senha && (
+          <p className="text-xs text-red-500">As senhas não coincidem.</p>
+        )}
 
-        <p className="text-xs text-gray-500 leading-relaxed">
-          A senha deve conter ao menos: <br />• 8 caracteres <br />• Uma letra maiúscula <br />•
-          Um número <br />• Um símbolo
+        <p className="text-xs text-gray-500 leading-relaxed mt-2">
+          A senha deve conter ao menos: <br />• 8 caracteres <br />• Uma letra maiúscula <br />• Um
+          número <br />• Um símbolo
         </p>
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition disabled:opacity-50"
+          disabled={!formValido || loading}
+          className={`w-full font-medium py-2 rounded-lg transition ${
+            !formValido
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-purple-600 hover:bg-purple-700 text-white"
+          }`}
         >
-          {loading ? "Criando conta..." : "Criar conta"}
+          {loading
+            ? "Criando conta..."
+            : !formValido
+            ? "Preencha todos os campos corretamente"
+            : "Criar conta"}
         </button>
       </form>
 
