@@ -322,7 +322,7 @@ export default function LandingPage() {
                 <li>Exportação CSV</li>
               </ul>
               <button
-                onClick={() => router.push("/checkout/pessoal")}
+                onClick={() => router.push("/auth/register")}
                 className="mt-6 w-full bg-white border border-purple-600 text-purple-600 py-2 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
               >
                 Escolher plano
@@ -360,7 +360,7 @@ export default function LandingPage() {
               </ul>
 
               <button
-                onClick={() => router.push("/checkout/profissional")}
+                onClick={() => router.push("/auth/register")}
                 className="mt-6 w-full bg-yellow-400 text-gray-900 py-3 rounded-lg font-semibold shadow-lg hover:bg-yellow-300 transition-colors"
               >
                 Assinar Profissional
@@ -477,7 +477,7 @@ export default function LandingPage() {
           <p className="mt-3 text-white/90">Comece agora e experimente o plano Premium por 7 dias.</p>
           <div className="mt-6 flex items-center justify-center gap-4">
             <button onClick={() => router.push("/auth/register")} className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold">Criar Conta</button>
-            <button onClick={() => router.push("/checkout/premium")} className="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold">Assinar Premium</button>
+            <button onClick={() => router.push("/auth/register")} className="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold">Assinar Premium</button>
           </div>
         </div>
       </motion.section>
