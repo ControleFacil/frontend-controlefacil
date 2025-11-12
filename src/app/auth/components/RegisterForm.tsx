@@ -17,20 +17,24 @@ const RegisterForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [formValido, setFormValido] = useState(false);
 
-  // ✅ Regra para senha forte
+  // ✅ Mesmas validações do backend
+  const nomeCompletoValido = (n: string, s: string) =>
+    /^[A-Za-zÀ-ÿ]+(\s+[A-Za-zÀ-ÿ]+)+$/.test(`${n} ${s}`.trim());
+
+  const emailValido = (e: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+
   const senhaValida = (s: string) =>
-    /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]).{8,}$/.test(s);
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(s);
 
-  // 🔍 Atualiza a validade geral do formulário
+  // 🧠 Atualiza a validade do formulário
   useEffect(() => {
-    const camposOk =
-      nome.trim().length > 0 &&
-      sobrenome.trim().length > 0 &&
-      /\S+@\S+\.\S+/.test(email) &&
+    setFormValido(
+      nomeCompletoValido(nome, sobrenome) &&
+      emailValido(email) &&
       senhaValida(senha) &&
-      senha === confirmarSenha;
-
-    setFormValido(camposOk);
+      senha === confirmarSenha
+    );
   }, [nome, sobrenome, email, senha, confirmarSenha]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,11 +58,12 @@ const RegisterForm: React.FC = () => {
       });
 
       console.log("Resposta da API:", response.data);
+
       if (response?.data?.email) {
         alert("Conta criada com sucesso! Faça login para continuar.");
         router.push("/auth/login");
       } else {
-        throw new Error("Falha ao criar usuário. Nenhum e-mail retornado da API.");
+        throw new Error("Falha ao criar usuário. Nenhum dado retornado.");
       }
     } catch (err: any) {
       console.error("Erro ao criar conta:", err);
@@ -66,7 +71,8 @@ const RegisterForm: React.FC = () => {
       const mensagem =
         err.response?.status === 409
           ? "E-mail já cadastrado. Tente outro."
-          : err.response?.data || "Erro ao criar conta. Tente novamente.";
+          : err.response?.data?.message ||
+            "Erro ao criar conta. Verifique os dados e tente novamente.";
 
       setError(mensagem);
     } finally {
@@ -101,14 +107,25 @@ const RegisterForm: React.FC = () => {
           className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           required
         />
+        {!nomeCompletoValido(nome, sobrenome) && nome && sobrenome && (
+          <p className="text-red-500 text-xs">
+            Informe seu nome completo (nome e sobrenome válidos).
+          </p>
+        )}
+
         <input
           type="email"
           placeholder="E-mail"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className={`w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+            emailValido(email)
+              ? "focus:ring-green-500"
+              : "focus:ring-red-500 border-red-300"
+          }`}
           required
         />
+
         <input
           type="password"
           placeholder="Senha"
@@ -135,8 +152,11 @@ const RegisterForm: React.FC = () => {
         />
 
         <p className="text-xs text-gray-500 leading-relaxed">
-          A senha deve conter ao menos: <br />• 8 caracteres <br />• Uma letra
-          maiúscula <br />• Um número <br />• Um símbolo
+          A senha deve conter:
+          <br />• Mínimo de 8 caracteres
+          <br />• Uma letra maiúscula
+          <br />• Um número
+          <br />• Um símbolo (@$!%*?&)
         </p>
 
         <button
@@ -151,6 +171,10 @@ const RegisterForm: React.FC = () => {
           {loading ? "Criando conta..." : "Criar conta"}
         </button>
       </form>
+
+      {error && (
+        <p className="text-red-500 text-sm mt-3 text-center">{error}</p>
+      )}
 
       <div className="flex items-center my-5">
         <div className="flex-grow border-t border-black"></div>
@@ -171,10 +195,6 @@ const RegisterForm: React.FC = () => {
           <Image src="/assets/facebook.png" alt="Facebook" width={25} height={25} />
         </button>
       </div>
-
-      {error && (
-        <p className="text-red-500 text-sm mt-3 text-center">{error}</p>
-      )}
 
       <div className="flex justify-between text-xs text-gray-400 mt-6">
         <span>Termos e condições</span>
