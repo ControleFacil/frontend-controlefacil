@@ -15,31 +15,31 @@ const RegisterForm: React.FC = () => {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [senhaValida, setSenhaValida] = useState(false);
   const [formValido, setFormValido] = useState(false);
 
-  // Validação da senha
-  useEffect(() => {
-    const senhaRegex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
-    setSenhaValida(senhaRegex.test(senha));
-  }, [senha]);
+  // ✅ Regra para senha forte
+  const senhaValida = (s: string) =>
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]).{8,}$/.test(s);
 
-  // Validação do formulário completo
+  // 🔍 Atualiza a validade geral do formulário
   useEffect(() => {
-    const isValid =
-      nome.trim() !== "" &&
-      sobrenome.trim() !== "" &&
-      email.trim() !== "" &&
-      senhaValida &&
-      confirmarSenha === senha;
-    setFormValido(isValid);
-  }, [nome, sobrenome, email, senha, confirmarSenha, senhaValida]);
+    const camposOk =
+      nome.trim().length > 0 &&
+      sobrenome.trim().length > 0 &&
+      /\S+@\S+\.\S+/.test(email) &&
+      senhaValida(senha) &&
+      senha === confirmarSenha;
+
+    setFormValido(camposOk);
+  }, [nome, sobrenome, email, senha, confirmarSenha]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formValido) return;
+
+    if (!formValido) {
+      setError("Preencha todos os campos corretamente antes de continuar.");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -53,15 +53,21 @@ const RegisterForm: React.FC = () => {
         senha,
       });
 
-      sessionStorage.setItem("registeredUser", JSON.stringify(response.data));
-      alert("Conta criada com sucesso! Faça login para continuar.");
-      router.push("/auth/login");
+      console.log("Resposta da API:", response.data);
+      if (response?.data?.email) {
+        alert("Conta criada com sucesso! Faça login para continuar.");
+        router.push("/auth/login");
+      } else {
+        throw new Error("Falha ao criar usuário. Nenhum e-mail retornado da API.");
+      }
     } catch (err: any) {
       console.error("Erro ao criar conta:", err);
+
       const mensagem =
         err.response?.status === 409
           ? "E-mail já cadastrado. Tente outro."
           : err.response?.data || "Erro ao criar conta. Tente novamente.";
+
       setError(mensagem);
     } finally {
       setLoading(false);
@@ -70,9 +76,12 @@ const RegisterForm: React.FC = () => {
 
   return (
     <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-[-8px_8px_12px_rgba(168,85,247,0.7)] font-['Noto_Sans']">
-      <h2 className="text-2xl font-semibold mb-1 text-gray-800">Crie seu Usuário</h2>
+      <h2 className="text-2xl font-semibold mb-1 text-gray-800">
+        Crie seu Usuário
+      </h2>
       <p className="text-black mb-6 font-medium">
-        É um prazer ter <span className="text-purple-600 font-semibold">você</span> com a gente!
+        É um prazer ter{" "}
+        <span className="text-purple-600 font-semibold">você</span> com a gente!
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -82,6 +91,7 @@ const RegisterForm: React.FC = () => {
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          required
         />
         <input
           type="text"
@@ -89,6 +99,7 @@ const RegisterForm: React.FC = () => {
           value={sobrenome}
           onChange={(e) => setSobrenome(e.target.value)}
           className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          required
         />
         <input
           type="email"
@@ -96,55 +107,48 @@ const RegisterForm: React.FC = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          required
         />
         <input
           type="password"
           placeholder="Senha"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
-          className={`w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none ${
-            senha && !senhaValida ? "border-red-400" : "focus:ring-2 focus:ring-purple-500"
+          className={`w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+            senhaValida(senha)
+              ? "focus:ring-green-500"
+              : "focus:ring-red-500 border-red-300"
           }`}
+          required
         />
-        {!senhaValida && senha && (
-          <p className="text-xs text-red-500">
-            Senha fraca: siga os requisitos abaixo.
-          </p>
-        )}
         <input
           type="password"
           placeholder="Confirmar senha"
           value={confirmarSenha}
           onChange={(e) => setConfirmarSenha(e.target.value)}
-          className={`w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none ${
-            confirmarSenha && confirmarSenha !== senha
-              ? "border-red-400"
-              : "focus:ring-2 focus:ring-purple-500"
+          className={`w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+            senha === confirmarSenha && confirmarSenha.length > 0
+              ? "focus:ring-green-500"
+              : "focus:ring-red-500 border-red-300"
           }`}
+          required
         />
-        {confirmarSenha && confirmarSenha !== senha && (
-          <p className="text-xs text-red-500">As senhas não coincidem.</p>
-        )}
 
-        <p className="text-xs text-gray-500 leading-relaxed mt-2">
-          A senha deve conter ao menos: <br />• 8 caracteres <br />• Uma letra maiúscula <br />• Um
-          número <br />• Um símbolo
+        <p className="text-xs text-gray-500 leading-relaxed">
+          A senha deve conter ao menos: <br />• 8 caracteres <br />• Uma letra
+          maiúscula <br />• Um número <br />• Um símbolo
         </p>
 
         <button
           type="submit"
           disabled={!formValido || loading}
-          className={`w-full font-medium py-2 rounded-lg transition ${
-            !formValido
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-purple-600 hover:bg-purple-700 text-white"
+          className={`w-full text-white font-medium py-2 rounded-lg transition ${
+            formValido && !loading
+              ? "bg-purple-600 hover:bg-purple-700"
+              : "bg-gray-300 cursor-not-allowed"
           }`}
         >
-          {loading
-            ? "Criando conta..."
-            : !formValido
-            ? "Preencha todos os campos corretamente"
-            : "Criar conta"}
+          {loading ? "Criando conta..." : "Criar conta"}
         </button>
       </form>
 
@@ -156,14 +160,21 @@ const RegisterForm: React.FC = () => {
 
       <div className="flex gap-9 justify-center">
         <button className="px-2 py-2 rounded-lg flex items-center text-sm hover:bg-gray-50 transition">
-          <Image src="/assets/googleIcon.png" alt="Google" width={25} height={25} />
+          <Image
+            src="/assets/googleIcon.png"
+            alt="Google"
+            width={25}
+            height={25}
+          />
         </button>
         <button className="px-2 py-2 rounded-lg flex items-center text-sm hover:bg-gray-50 transition">
           <Image src="/assets/facebook.png" alt="Facebook" width={25} height={25} />
         </button>
       </div>
 
-      {error && <p className="text-red-500 text-sm mt-3 text-center">{error}</p>}
+      {error && (
+        <p className="text-red-500 text-sm mt-3 text-center">{error}</p>
+      )}
 
       <div className="flex justify-between text-xs text-gray-400 mt-6">
         <span>Termos e condições</span>
