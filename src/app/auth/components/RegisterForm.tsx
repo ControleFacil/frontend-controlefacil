@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
+import { Eye, EyeOff } from "lucide-react"; // 👁️ usando ícones bonitos
 
 const RegisterForm: React.FC = () => {
   const router = useRouter();
@@ -13,6 +14,8 @@ const RegisterForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formValido, setFormValido] = useState(false);
@@ -31,9 +34,9 @@ const RegisterForm: React.FC = () => {
   useEffect(() => {
     setFormValido(
       nomeCompletoValido(nome, sobrenome) &&
-      emailValido(email) &&
-      senhaValida(senha) &&
-      senha === confirmarSenha
+        emailValido(email) &&
+        senhaValida(senha) &&
+        senha === confirmarSenha
     );
   }, [nome, sobrenome, email, senha, confirmarSenha]);
 
@@ -126,30 +129,51 @@ const RegisterForm: React.FC = () => {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-          className={`w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
-            senhaValida(senha)
-              ? "focus:ring-green-500"
-              : "focus:ring-red-500 border-red-300"
-          }`}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Confirmar senha"
-          value={confirmarSenha}
-          onChange={(e) => setConfirmarSenha(e.target.value)}
-          className={`w-full text-black border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
-            senha === confirmarSenha && confirmarSenha.length > 0
-              ? "focus:ring-green-500"
-              : "focus:ring-red-500 border-red-300"
-          }`}
-          required
-        />
+        {/* Campo senha com olho */}
+        <div className="relative">
+          <input
+            type={mostrarSenha ? "text" : "password"}
+            placeholder="Senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            className={`w-full text-black border rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 ${
+              senhaValida(senha)
+                ? "focus:ring-green-500"
+                : "focus:ring-red-500 border-red-300"
+            }`}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setMostrarSenha(!mostrarSenha)}
+            className="absolute right-3 top-2.5 text-gray-600 hover:text-purple-600 transition"
+          >
+            {mostrarSenha ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
+
+        {/* Campo confirmar senha com olho */}
+        <div className="relative">
+          <input
+            type={mostrarConfirmar ? "text" : "password"}
+            placeholder="Confirmar senha"
+            value={confirmarSenha}
+            onChange={(e) => setConfirmarSenha(e.target.value)}
+            className={`w-full text-black border rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 ${
+              senha === confirmarSenha && confirmarSenha.length > 0
+                ? "focus:ring-green-500"
+                : "focus:ring-red-500 border-red-300"
+            }`}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
+            className="absolute right-3 top-2.5 text-gray-600 hover:text-purple-600 transition"
+          >
+            {mostrarConfirmar ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
 
         <p className="text-xs text-gray-500 leading-relaxed">
           A senha deve conter:
