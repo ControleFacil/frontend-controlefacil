@@ -63,7 +63,7 @@ export default function PlanPage() {
         className="w-full max-w-6xl text-center mb-14"
       >
         <div className="inline-flex items-center justify-center gap-3">
-          <Image src="/assets/cflogo.png" alt="Controle Fácil" width={40} height={40} />
+          <Image src="/assets/cfLogo.png" alt="Controle Fácil" width={40} height={40} />
           <h1 className="text-3xl font-extrabold text-purple-700">Controle Fácil</h1>
         </div>
         <p className="text-sm text-gray-600 mt-2">Passo 2 de 3</p>
