@@ -135,7 +135,7 @@ export default function LandingPage() {
 
             <div className="mt-6 text-sm text-gray-500 max-w-md mx-auto lg:mx-0">
               <span className="inline-block mr-2 font-medium">Planos a partir de</span>
-              <span className="inline-block px-3 py-1 rounded bg-purple-100 font-semibold text-purple-700">R$ 19,90 / mês</span>
+              <span className="inline-block px-3 py-1 rounded bg-purple-100 font-semibold text-purple-700">R$ 29,90 / mês</span>
             </div>
           </div>
 
