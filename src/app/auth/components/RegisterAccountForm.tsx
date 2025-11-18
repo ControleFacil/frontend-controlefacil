@@ -37,8 +37,6 @@ const RegisterAccountForm: React.FC = () => {
         }
       );
 
-      console.log("Conta criada:", response.data);
-
       alert("Conta criada com sucesso!");
       router.push("/auth/register/plan");
     } catch (err: any) {

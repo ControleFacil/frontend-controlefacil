@@ -7,8 +7,6 @@ export const loginDashboard = async (
 ) => {
 const response = await api.post("/login", { email, senha });
 
-  console.log("response.data", response.data);
-
   const token = response.data?.token
   if (!token) {
     console.error("Resposta da API não contém token:", response.data);
