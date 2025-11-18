@@ -91,7 +91,7 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <main className="min-h-screen font-['Noto_Sans'] bg-white text-gray-900 overflow-x-hidden">
+    <main className="min-h-screen font-['Noto_Sans'] bg-background text-gray-900 overflow-x-hidden">
       {/* HERO */}
       <motion.section
         initial="hidden"
@@ -147,7 +147,7 @@ export default function LandingPage() {
             <motion.div
               whileHover={{ scale: 1.03 }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="relative w-[360px] h-[360px] shadow-2xl rounded-3xl overflow-hidden bg-white"
+              className="relative w-[360px] h-[360px] shadow-2xl rounded-3xl overflow-hidden bg-background"
             >
               <Image
                 src="/assets/cfLogo.png"
@@ -193,7 +193,7 @@ export default function LandingPage() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.15 }}
         variants={fadeUp}
-        className="py-20 bg-white"
+        className="py-20 bg-background"
       >
         <div className="max-w-7xl mx-auto px-6">
           <motion.h3 variants={fadeUp} className="text-3xl font-semibold text-center text-purple-600">O que o ControleFácil faz por você</motion.h3>
@@ -209,7 +209,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.12 }}
-                className="bg-white rounded-2xl p-6 shadow-md flex flex-col hover:shadow-xl transition-shadow"
+                className="bg-background rounded-2xl p-6 shadow-md flex flex-col hover:shadow-xl transition-shadow"
               >
                 <motion.div whileHover={{ scale: 1.03 }} className="w-full aspect-square rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-purple-50 to-white flex items-center justify-center">
                   <Image src={f.img} alt={f.title} width={600} height={600} className="object-contain p-4 w-full h-full" />
@@ -239,7 +239,7 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 className="w-full lg:w-1/2"
               >
-                <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-xl bg-white">
+                <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-xl bg-background">
                   <Image src={f.img} alt={f.title} fill className="object-contain p-4" />
                 </div>
               </motion.div>
@@ -256,10 +256,10 @@ export default function LandingPage() {
                 <p className="mt-4 text-gray-600">{f.text}</p>
 
                 <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <li className="bg-white p-3 rounded-lg shadow-sm">Rápido registro</li>
-                  <li className="bg-white p-3 rounded-lg shadow-sm">Filtros avançados</li>
-                  <li className="bg-white p-3 rounded-lg shadow-sm">Alertas inteligentes</li>
-                  <li className="bg-white p-3 rounded-lg shadow-sm">Exportar e compartilhar</li>
+                  <li className="bg-background p-3 rounded-lg shadow-sm">Rápido registro</li>
+                  <li className="bg-background p-3 rounded-lg shadow-sm">Filtros avançados</li>
+                  <li className="bg-background p-3 rounded-lg shadow-sm">Alertas inteligentes</li>
+                  <li className="bg-background p-3 rounded-lg shadow-sm">Exportar e compartilhar</li>
                 </ul>
 
                 <div className="mt-6">
@@ -279,7 +279,7 @@ export default function LandingPage() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.15 }}
         variants={fadeUp}
-        className="py-24 bg-white"
+        className="py-24 bg-background"
       >
         <div className="max-w-6xl mx-auto px-6 text-center">
           <motion.h2
@@ -303,13 +303,13 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.05 }}
               viewport={{ once: true }}
-              className="p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+              className="p-6 rounded-2xl border border-borderc shadow-sm hover:shadow-md transition-shadow"
             >
               <h4 className="text-xl font-semibold text-purple-600">
                 Pessoal
               </h4>
               <div className="mt-3 text-3xl font-bold text-gray-900">
-                R$19<span className="text-base align-top">,90</span>
+                R$29<span className="text-base align-top">,90</span>
                 <span className="text-sm font-medium text-gray-600">/mês</span>
               </div>
               <p className="mt-4 text-gray-600">
@@ -323,7 +323,7 @@ export default function LandingPage() {
               </ul>
               <button
                 onClick={() => router.push("/auth/register")}
-                className="mt-6 w-full bg-white border border-purple-600 text-purple-600 py-2 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
+                className="mt-6 w-full bg-background border border-purple-600 text-purple-600 py-2 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
               >
                 Escolher plano
               </button>
@@ -343,7 +343,7 @@ export default function LandingPage() {
 
               <h4 className="text-xl font-semibold">Profissional</h4>
               <div className="mt-3 text-4xl font-bold">
-                R$49<span className="text-base align-top">,90</span>
+                R$59<span className="text-base align-top">,90</span>
                 <span className="text-sm font-medium">/mês</span>
               </div>
               <p className="mt-4 text-white/90">
@@ -377,7 +377,7 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.25 }}
               viewport={{ once: true }}
-              className="p-6 rounded-2xl border border-gray-200 shadow-sm bg-gray-50 hover:shadow-md transition-shadow"
+              className="p-6 rounded-2xl border border-borderc shadow-sm bg-gray-50 hover:shadow-md transition-shadow"
             >
               <h4 className="text-xl font-semibold text-gray-700">
                 Empresarial
@@ -410,7 +410,7 @@ export default function LandingPage() {
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeUp}
-        className="py-20 bg-gray-100"
+        className="py-20 bg-muted"
       >
         <div className="max-w-5xl mx-auto px-6 text-center">
           <motion.h3 variants={fadeUp} className="text-2xl font-bold text-gray-900">O que nossos usuários dizem</motion.h3>
@@ -422,7 +422,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: i * 0.12 }}
                 viewport={{ once: true }}
-                className="bg-white p-6 rounded-2xl shadow"
+                className="bg-background p-6 rounded-2xl shadow"
               >
                 <div className="flex items-start gap-4">
                   <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-200">
@@ -446,7 +446,7 @@ export default function LandingPage() {
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeUp}
-        className="py-20 bg-white"
+        className="py-20 bg-background"
       >
         <div className="max-w-4xl mx-auto px-6">
           <h3 className="text-2xl font-bold text-center text-gray-900">Perguntas frequentes</h3>
@@ -476,13 +476,13 @@ export default function LandingPage() {
           <h3 className="text-3xl font-bold">Pronto para transformar suas finanças?</h3>
           <p className="mt-3 text-white/90">Comece agora e experimente o plano Premium por 7 dias.</p>
           <div className="mt-6 flex items-center justify-center gap-4">
-            <button onClick={() => router.push("/auth/register")} className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold">Criar Conta</button>
+            <button onClick={() => router.push("/auth/register")} className="bg-background text-purple-600 px-6 py-3 rounded-lg font-semibold">Criar Conta</button>
             <button onClick={() => router.push("/auth/register")} className="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold">Assinar Premium</button>
           </div>
         </div>
       </motion.section>
 
-      <footer className="bg-white py-8 text-center text-sm text-gray-500 border-t">
+      <footer className="bg-background py-8 text-center text-sm text-gray-500 border-t">
         © {new Date().getFullYear()} ControleFácil — Todos os direitos reservados.
       </footer>
     </main>

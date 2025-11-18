@@ -144,7 +144,6 @@ const LoginForm: React.FC = () => {
         </motion.span>
       </motion.div>
 
-      {/* Mensagem de erro animada */}
       <AnimatePresence>
         {error && (
           <motion.div
@@ -159,15 +158,13 @@ const LoginForm: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Separador */}
+      
       <div className="flex items-center my-5">
         <div className="flex-grow border-t border-black"></div>
         <span className="mx-4 text-black text-xs">ou</span>
         <div className="flex-grow border-t border-black"></div>
       </div>
 
-    {/* Botões sociais */}
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
