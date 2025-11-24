@@ -186,8 +186,6 @@ export default function LandingPage() {
           </motion.button>
         </div>
       </motion.section>
-
-      {/* FEATURES GRID (summary) */}
       <motion.section
         initial="hidden"
         whileInView="visible"

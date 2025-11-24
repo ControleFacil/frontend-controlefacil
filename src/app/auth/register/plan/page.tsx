@@ -53,7 +53,7 @@ export default function PlanPage() {
   };
 
   return (
-    <main className="min-h-screen font-['Noto_Sans'] bg-gradient-to-br from-purple-50 to-white px-6 py-16 flex flex-col items-center">
+    <main className="min-h-screen font-['Noto_Sans'] bg-gradient-to-br from-purple-50 to-white px-6 py-16">
       {/* HEADER */}
       <motion.header
         initial="hidden"
@@ -76,7 +76,7 @@ export default function PlanPage() {
       </motion.header>
 
       {/* PLANS GRID */}
-      <section className="w-full max-w-7xl">
+     <section className="w-full max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {planos.map((plano, idx) => {
             const isSelected = selected === plano.id;
@@ -160,6 +160,30 @@ export default function PlanPage() {
             );
           })}
         </div>
+        {/* Caixa de Suporte via WhatsApp (menor e alinhada à esquerda) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="bg-green-50 border border-green-300 p-4 rounded-2xl shadow-md mt-10 w-[350px]"
+          >
+            <h3 className="text-green-900 font-bold text-base flex items-center gap-2">
+              Suporte via WhatsApp
+            </h3>
+
+            <p className="text-green-800 text-xs mt-1 leading-relaxed">
+              Tire dúvidas sobre os planos e peça <strong>7 dias grátis</strong>.
+            </p>
+
+            <button
+              onClick={() => window.open("https://wa.me/553499999999", "_blank")}
+              className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow"
+            >
+              <Image src="/assets/whatsapp.png" alt="WhatsApp" width={18} height={18} />
+              Falar no WhatsApp
+            </button>
+          </motion.div>
 
         {/* Footer / Botão continuar */}
         <div className="mt-12 text-center">
