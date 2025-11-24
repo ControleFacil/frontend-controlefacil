@@ -52,6 +52,8 @@ export default function PlanPage() {
     }
   };
 
+  const skeletonArray = [1, 2, 3]; // Quantos skeletons quer mostrar
+
   return (
     <main className="min-h-screen font-['Noto_Sans'] bg-gradient-to-br from-purple-50 to-white px-6 py-16 flex flex-col items-center">
       
@@ -84,88 +86,95 @@ export default function PlanPage() {
         variants={fadeUp}
         className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8 items-start"
       >
-        {planos.map((plano, idx) => {
-          const isSelected = selected === plano.id;
-          return (
-            <motion.article
-              key={plano.id}
-              onClick={() => setSelected(plano.id)}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className={`relative rounded-3xl p-8 cursor-pointer transition-transform duration-300 transform
-                ${isSelected
-                  ? "scale-105 shadow-2xl bg-gradient-to-br from-purple-600 to-purple-500 text-white border border-purple-500"
-                  : "bg-white border border-gray-200 shadow-lg hover:shadow-xl"
-                }`}
-              aria-pressed={isSelected}
-              role="button"
-            >
-              {/* Popular Badge */}
-              {plano.popular && !isSelected && (
-                <span className="absolute -top-3 right-4 bg-yellow-400 text-gray-900 text-xs font-semibold px-3 py-1 rounded-full shadow">
-                  Mais popular
-                </span>
-              )}
-
-              {/* Título */}
+        {planos.length === 0
+          ? skeletonArray.map((_, idx) => (
               <div
-                className={`mb-5 inline-block rounded-xl px-4 py-2 font-semibold text-lg ${
-                  isSelected ? "bg-white/10 text-white" : "bg-purple-100 text-purple-700"
-                }`}
-              >
-                {plano.nome.charAt(0).toUpperCase() + plano.nome.slice(1).toLowerCase()}
-              </div>
-
-              {/* Preço */}
-              <div className={`text-4xl font-bold mb-3 ${isSelected ? "text-white" : "text-gray-900"}`}>
-                R$ {plano.precoMensal.toFixed(2)}
-                <span className={`text-sm font-medium ml-2 ${isSelected ? "text-white/80" : "text-gray-600"}`}>
-                  /mês
-                </span>
-              </div>
-
-              {/* Descrição */}
-              {plano.descricao && (
-                <p className={`mb-6 ${isSelected ? "text-white/90" : "text-gray-600"}`}>
-                  {plano.descricao}
-                </p>
-              )}
-
-              {/* Features */}
-              <ul className={`space-y-3 mb-8 text-sm ${isSelected ? "text-white/90" : "text-gray-700"}`}>
-                <li>Preço mensal: R$ {plano.precoMensal.toFixed(2)}</li>
-                <li>Acesso ao Bot WhatsApp</li>
-                <li>Limite de {plano.limiteTransacoes} transações/mês</li>
-                <li>{plano.suportePrioritario ? "Suporte prioritário" : "Sem suporte prioritário"}</li>
-                <li>Relatórios avançados</li>
-                <li>Backups automáticos</li>
-                <li>Suporte via chat</li>
-              </ul>
-
-              {/* CTA */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelected(plano.id);
-                  }}
-                  className={`px-5 py-3 rounded-lg font-semibold text-sm transition
-                    ${isSelected ? "bg-white text-purple-700 hover:bg-white/90" : "bg-purple-600 text-white hover:bg-purple-500"}
-                  `}
+                key={idx}
+                className="h-96 rounded-3xl bg-gray-200 animate-pulse"
+              ></div>
+            ))
+          : planos.map((plano, idx) => {
+              const isSelected = selected === plano.id;
+              return (
+                <motion.article
+                  key={plano.id}
+                  onClick={() => setSelected(plano.id)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className={`relative rounded-3xl p-8 cursor-pointer transition-transform duration-300 transform
+                    ${isSelected
+                      ? "scale-105 shadow-2xl bg-gradient-to-br from-purple-600 to-purple-500 text-white border border-purple-500"
+                      : "bg-white border border-gray-200 shadow-lg hover:shadow-xl"
+                    }`}
+                  aria-pressed={isSelected}
+                  role="button"
                 >
-                  {isSelected ? "Selecionado" : "Selecionar"}
-                </button>
+                  {/* Popular Badge */}
+                  {plano.popular && !isSelected && (
+                    <span className="absolute -top-3 right-4 bg-yellow-400 text-gray-900 text-xs font-semibold px-3 py-1 rounded-full shadow">
+                      Mais popular
+                    </span>
+                  )}
 
-                {isSelected && (
-                  <div className="ml-auto bg-white text-purple-600 rounded-full p-1 shadow-md">
-                    <Check size={20} />
+                  {/* Título */}
+                  <div
+                    className={`mb-5 inline-block rounded-xl px-4 py-2 font-semibold text-lg ${
+                      isSelected ? "bg-white/10 text-white" : "bg-purple-100 text-purple-700"
+                    }`}
+                  >
+                    {plano.nome.charAt(0).toUpperCase() + plano.nome.slice(1).toLowerCase()}
                   </div>
-                )}
-              </div>
-            </motion.article>
-          );
-        })}
+
+                  {/* Preço */}
+                  <div className={`text-4xl font-bold mb-3 ${isSelected ? "text-white" : "text-gray-900"}`}>
+                    R$ {plano.precoMensal.toFixed(2)}
+                    <span className={`text-sm font-medium ml-2 ${isSelected ? "text-white/80" : "text-gray-600"}`}>
+                      /mês
+                    </span>
+                  </div>
+
+                  {/* Descrição */}
+                  {plano.descricao && (
+                    <p className={`mb-6 ${isSelected ? "text-white/90" : "text-gray-600"}`}>
+                      {plano.descricao}
+                    </p>
+                  )}
+
+                  {/* Features */}
+                  <ul className={`space-y-3 mb-8 text-sm ${isSelected ? "text-white/90" : "text-gray-700"}`}>
+                    <li>Preço mensal: R$ {plano.precoMensal.toFixed(2)}</li>
+                    <li>Acesso ao Bot WhatsApp</li>
+                    <li>Limite de {plano.limiteTransacoes} transações/mês</li>
+                    <li>{plano.suportePrioritario ? "Suporte prioritário" : "Sem suporte prioritário"}</li>
+                    <li>Relatórios avançados</li>
+                    <li>Backups automáticos</li>
+                    <li>Suporte via chat</li>
+                  </ul>
+
+                  {/* CTA */}
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelected(plano.id);
+                      }}
+                      className={`px-5 py-3 rounded-lg font-semibold text-sm transition
+                        ${isSelected ? "bg-white text-purple-700 hover:bg-white/90" : "bg-purple-600 text-white hover:bg-purple-500"}
+                      `}
+                    >
+                      {isSelected ? "Selecionado" : "Selecionar"}
+                    </button>
+
+                    {isSelected && (
+                      <div className="ml-auto bg-white text-purple-600 rounded-full p-1 shadow-md">
+                        <Check size={20} />
+                      </div>
+                    )}
+                  </div>
+                </motion.article>
+              );
+            })}
       </motion.section>
 
       {/* SUPORTE WHATSAPP */}
