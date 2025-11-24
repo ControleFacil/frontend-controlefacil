@@ -177,7 +177,7 @@ export default function PlanPage() {
             </p>
 
             <button
-              onClick={() => window.open("https://wa.me/553499999999", "_blank")}
+              onClick={() => window.open("https://wa.me/559982777761", "_blank")}
               className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2 shadow"
             >
               <Image src="/assets/whatsapp.png" alt="WhatsApp" width={18} height={18} />
