@@ -5,6 +5,7 @@ import FinancialSummary from "./components/FinancialSummary";
 import MonthlyView from "./components/MonthlyView";
 import GastosExpenses from "./components/GastosExpenses";
 import EntradasPorDiaSemanaChart from "./components/EntradasPorDiaSemanaChart";
+import DateRangeSelector from "./components/DateRangeSelector";
 
 export default function DashboardPage() {
   return (
@@ -13,6 +14,11 @@ export default function DashboardPage() {
 
       <main className="flex-1 p-6 overflow-y-auto">
         <Header />
+      
+        <div className="mt-4 mb-6">
+          <DateRangeSelector />
+        </div>
+
         <div className="mt-8 mb-10">
           <FinancialSummary />
         </div>

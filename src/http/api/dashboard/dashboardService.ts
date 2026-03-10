@@ -64,11 +64,24 @@ export interface EntradasPorDiaResponse {
   diaSemana: string;
   total: number;
 }
+export interface PeriodoFiltro {
+  inicio: string;
+  fim: string;
+}
+export const getEntradasPorDiaSemana = async (
+  periodo: PeriodoFiltro
+): Promise<EntradasPorDiaResponse[]> => {
 
-export const getEntradasPorDiaSemana = async (): Promise<EntradasPorDiaResponse[]> => {
   try {
-    const response = await api.get("/api/transacao/entradas-por-dia-semana");
+    const response = await api.get("/api/transacao/entradas-por-dia-semana", {
+      params: {
+        inicio: periodo.inicio,
+        fim: periodo.fim
+      }
+    });
+
     return response.data;
+
   } catch (error) {
     console.error("Erro ao buscar entradas por dia da semana:", error);
     throw new Error("Não foi possível carregar os dados das entradas por dia da semana");
@@ -85,10 +98,20 @@ export const getMetas = async (): Promise<MetaResponse[]> => {
   }
 };
 
-export const getGastosPorCategoria = async (): Promise<CategoriaGastoResponse[]> => {
+export const getGastosPorCategoria = async (
+  periodo: PeriodoFiltro
+): Promise<CategoriaGastoResponse[]> => {
+
   try {
-    const response = await api.get("/api/transacao/visao-categorias");
+    const response = await api.get("/api/transacao/visao-categorias", {
+      params: {
+        inicio: periodo.inicio,
+        fim: periodo.fim
+      }
+    });
+
     return response.data;
+
   } catch (error) {
     console.error("Erro ao buscar gastos por categoria:", error);
     throw new Error("Não foi possível carregar os gastos por categoria");
@@ -134,16 +157,25 @@ export const getGastosFuturos = async (): Promise<GastoFuturoResponse[]> => {
     throw new Error('Não foi possível carregar os gastos futuros');
   }
 };
+export const getVisaoMensal = async (
+  periodo: PeriodoFiltro
+): Promise<VisaoMensalResponse[]> => {
 
-export const getVisaoMensal = async (): Promise<VisaoMensalResponse[]> => {
   try {
-    const response = await api.get('/api/transacao/visao-mensal');
+    const response = await api.get("/api/transacao/visao-mensal", {
+      params: {
+        inicio: periodo.inicio,
+        fim: periodo.fim
+      }
+    });
+
     return response.data;
+
   } catch (error) {
-    console.error('Erro ao buscar visão mensal:', error);
-    throw new Error('Não foi possível carregar a visão mensal');
+    console.error("Erro ao buscar visão mensal:", error);
+    throw new Error("Não foi possível carregar a visão mensal");
   }
-}; 
+};
 
 export const getCategorias = async (): Promise<string[]> => {
   try {

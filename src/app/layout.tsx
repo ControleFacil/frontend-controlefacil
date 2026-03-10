@@ -29,7 +29,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </AuthProvider>
           </ReactQueryProvider>
         </ThemeProvider>
-
         <Analytics/>
       </body>
     </html>

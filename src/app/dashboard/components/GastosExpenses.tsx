@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { useEffect, useState, useMemo } from "react";
 import { getGastosPorCategoria } from "@/http/api/dashboard/dashboardService";
+import { usePeriodo } from "@/context/PeriodoContext";
 
 // Exemplo de tipagem da resposta da API
 export interface CategoriaGastoResponse {
@@ -33,18 +34,18 @@ const COLORS = [
 
 export default function CategoryExpenses() {
   const [data, setData] = useState<CategoriaGastoResponse[]>([]);
-
+  const {periodo} = usePeriodo();
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await getGastosPorCategoria(); // retorna array { categoria, valor }
+        const response = await getGastosPorCategoria(periodo); // retorna array { categoria, valor }
         setData(response);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
       }
     }
     fetchData();
-  }, []);
+  }, [periodo]);
 
   // Total geral
   const total = useMemo(() => data.reduce((acc, item) => acc + item.valor, 0), [data]);

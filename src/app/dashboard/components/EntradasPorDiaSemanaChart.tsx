@@ -1,4 +1,5 @@
 "use client";
+import { usePeriodo } from "@/context/PeriodoContext";
 
 import { useEffect, useState, useMemo } from "react";
 import {
@@ -17,20 +18,39 @@ const COLORS = ["#8b5cf6", "#10b981", "#f59e0b", "#ef4444", "#3b82f6", "#ec4899"
 
 export default function EntradasPorDiaSemanaChart() {
   const [data, setData] = useState<EntradasPorDiaResponse[]>([]);
-
+  const { periodo } = usePeriodo();
   useEffect(() => {
     async function fetchData() {
       try {
-        const result = await getEntradasPorDiaSemana();
-        const order = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-        const ordered = order.map(dia => result.find(item => item.diaSemana === dia) || { diaSemana: dia, total: 0 });
+
+        const result = await getEntradasPorDiaSemana(periodo);
+
+        const order = [
+          "Segunda",
+          "Terça",
+          "Quarta",
+          "Quinta",
+          "Sexta",
+          "Sábado",
+          "Domingo"
+        ];
+
+        const ordered = order.map(
+          dia =>
+            result.find(item => item.diaSemana === dia) || {
+              diaSemana: dia,
+              total: 0
+            }
+        );
+
         setData(ordered);
+
       } catch (error) {
         console.error("Erro ao buscar entradas por dia da semana:", error);
       }
     }
     fetchData();
-  }, []);
+  }, [periodo]);
 
   const totalGeral = useMemo(() => data.reduce((acc, item) => acc + item.total, 0), [data]);
 

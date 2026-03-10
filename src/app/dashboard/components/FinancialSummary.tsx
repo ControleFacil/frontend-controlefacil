@@ -4,16 +4,19 @@ import { useEffect, useState } from "react";
 import { getVisaoMensal, VisaoMensalResponse } from "@/http/api/dashboard/dashboardService";
 import { ArrowUpCircle, ArrowDownCircle, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
+import { usePeriodo } from "@/context/PeriodoContext";
+
 
 export default function FinancialSummary() {
   const [entradas, setEntradas] = useState(0);
   const [saidas, setSaidas] = useState(0);
   const [saldo, setSaldo] = useState(0);
+  const {periodo} = usePeriodo();
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await getVisaoMensal();
+        const response = await getVisaoMensal(periodo);
 
         const totalEntradas = response.reduce((acc, item) => acc + (item.entrada || 0), 0);
         const totalSaidas = response.reduce((acc, item) => acc + (item.saida || 0), 0);
@@ -28,7 +31,7 @@ export default function FinancialSummary() {
     }
 
     fetchData();
-  }, []);
+  }, [periodo]);
 
   const cards = [
     {

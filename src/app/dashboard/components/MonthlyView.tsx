@@ -1,5 +1,5 @@
 "use client";
-
+import { usePeriodo } from "@/context/PeriodoContext";
 import {
   Line,
   XAxis,
@@ -11,14 +11,14 @@ import {
 import { useEffect, useState } from "react";
 import { getVisaoMensal, VisaoMensalResponse } from "@/http/api/dashboard/dashboardService";
 import { ArrowUpCircle, ArrowDownCircle } from "lucide-react";
-
 export default function MonthlyView() {
   const [data, setData] = useState<VisaoMensalResponse[]>([]);
+  const { periodo } = usePeriodo();
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await getVisaoMensal();
+        const response = await getVisaoMensal(periodo);
         const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
         const dataFormatada = meses.map((mes) => {
           const item = response.find(
@@ -36,7 +36,7 @@ export default function MonthlyView() {
       }
     }
     fetchData();
-  }, []);
+  }, [periodo]);
 
   const entradas = data.reduce((acc, item) => acc + item.entrada, 0);
   const saidas = data.reduce((acc, item) => acc + item.saida, 0);
