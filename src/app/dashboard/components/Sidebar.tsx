@@ -12,13 +12,16 @@ import {
   Menu,
   X,
   MessageCircle,
+  Landmark,
+  Box
 } from "lucide-react";
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutGrid, href: "/dashboard" },
   { name: "Transações", icon: CreditCard, href: "/dashboard/pagamentos" },
   { name: "Metas e Gastos Futuros", icon: History, href: "/dashboard/metas-e-gastos" },
-  { name: "Serviços", icon: Settings, href: "/dashboard/servicos" },
+  { name: "Dividas", icon: Landmark, href: "/dashboard/dividas" },
+  { name: "Serviços", icon: Box, href: "/dashboard/servicos" },
   { name: "Configurações", icon: Settings, href: "/dashboard/configuracoes" },
 ];
 

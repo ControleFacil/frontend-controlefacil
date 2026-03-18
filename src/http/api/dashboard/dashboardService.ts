@@ -64,6 +64,48 @@ export interface EntradasPorDiaResponse {
   diaSemana: string;
   total: number;
 }
+export type TipoDivida =
+  | "PARCELADA"
+  | "FIXA"
+  | "RECORRENTE"
+
+export interface Divida {
+  id: string
+
+  nomeCredor: string
+  categoria: string
+
+  tipo: TipoDivida
+
+  valorTotal: number
+
+  quantidadeParcelas: number | null
+  parcelasPagas: number
+
+  valorParcela: number
+  valorPago: number
+  valorRestante: number
+
+  dataPrimeiroVencimento: string
+  diaVencimento: number | null
+
+  quitada: boolean
+
+  observacoes?: string
+
+  criadoEm: string
+  atualizadoEm: string
+}
+export interface DividaRequest {
+  nomeCredor: string
+  categoria: string
+  tipo: TipoDivida
+  valorTotal: number
+  quantidadeParcelas: number | null
+  dataPrimeiroVencimento: string
+  diaVencimento: number | null
+  observacoes?: string
+}
 export interface PeriodoFiltro {
   inicio: string;
   fim: string;
@@ -87,6 +129,58 @@ export const getEntradasPorDiaSemana = async (
     throw new Error("Não foi possível carregar os dados das entradas por dia da semana");
   }
 };
+
+// dividas
+export const getDividas = async (): Promise<Divida[]> => {
+  const { data } = await api.get("/api/dividas")
+  return data
+}
+
+export const createDivida = async (payload: DividaRequest): Promise<Divida> => {
+  const { data } = await api.post("/api/dividas", payload)
+  return data
+}
+
+export const updateDivida = async (
+  id: string,
+  payload: Partial<DividaRequest>
+): Promise<Divida> => {
+  const { data } = await api.put(`/api/dividas/${id}`, payload)
+  return data
+}
+
+export const deleteDivida = async (id: string) => {
+  await api.delete(`/api/dividas/${id}`)
+}
+
+export const pagarTudo = async (id: string) => {
+  const { data } = await api.post(`/api/dividas/${id}/pagar-tudo`)
+  return data
+}
+
+export const pagarParcela = async (id: string) => {
+  const { data } = await api.post(`/api/dividas/${id}/pagar-parcela`)
+  return data
+}
+
+export const pagarParcelas = async (id: string, quantidade: number) => {
+  const { data } = await api.post(`/api/dividas/${id}/pagar-parcelas`, null, {
+    params: { quantidade }
+  })
+  return data
+}
+
+export const pagarValor = async (id: string, valor: number) => {
+  const { data } = await api.post(`/api/dividas/${id}/pagar-valor`, null, {
+    params: { valor }
+  })
+  return data
+}
+
+export const statusDivida = async (id: string) => {
+  const { data } = await api.get(`/api/dividas/${id}/status`)
+  return data
+}
 
 export const getMetas = async (): Promise<MetaResponse[]> => {
   try {

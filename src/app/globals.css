@@ -24,3 +24,75 @@ body {
   background-color: var(--background);
   color: var(--foreground);
 }
+
+.blog-container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* PARÁGRAFOS */
+.blog-p {
+  font-size: 1.125rem;
+  line-height: 1.9;
+  margin: 1.2rem 0;
+  color: #374151;
+}
+
+/* HEADINGS */
+.blog-h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.blog-h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.blog-h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+}
+
+/* QUOTE */
+.blog-quote {
+  border-left: 4px solid #7c3aed;
+  padding-left: 1rem;
+  color: #6b7280;
+  font-style: italic;
+  margin: 2rem 0;
+}
+
+/* LINK */
+.blog-link {
+  color: #7c3aed;
+  font-weight: 500;
+}
+
+.blog-link:hover {
+  text-decoration: underline;
+}
+
+/* IMAGEM */
+.blog-image {
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+/* CÓDIGO */
+.blog-inline-code {
+  background: #f3f4f6;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.blog-code {
+  border-radius: 10px;
+  margin: 2rem 0;
+}
