@@ -135,7 +135,7 @@ export default function LandingPage() {
 
             <div className="mt-6 text-sm text-gray-500 max-w-md mx-auto lg:mx-0">
               <span className="inline-block mr-2 font-medium">Planos a partir de</span>
-              <span className="inline-block px-3 py-1 rounded bg-purple-100 font-semibold text-purple-700">R$ 29,90 / mês</span>
+              <span className="inline-block px-3 py-1 rounded bg-purple-100 font-semibold text-purple-700">R$ 9,90 / mês</span>
             </div>
           </div>
 
@@ -307,7 +307,7 @@ export default function LandingPage() {
                 Pessoal
               </h4>
               <div className="mt-3 text-3xl font-bold text-gray-900">
-                R$29<span className="text-base align-top">,90</span>
+                R$9<span className="text-base align-top">,90</span>
                 <span className="text-sm font-medium text-gray-600">/mês</span>
               </div>
               <p className="mt-4 text-gray-600">
@@ -341,7 +341,7 @@ export default function LandingPage() {
 
               <h4 className="text-xl font-semibold">Profissional</h4>
               <div className="mt-3 text-4xl font-bold">
-                R$59<span className="text-base align-top">,90</span>
+                R$19<span className="text-base align-top">,90</span>
                 <span className="text-sm font-medium">/mês</span>
               </div>
               <p className="mt-4 text-white/90">
